@@ -1,0 +1,123 @@
+﻿html,body{height:100%;padding:0;margin:0;overflow:hidden;}
+.menu li:first-child {
+    background:#f00;
+    font-weight:bold;
+    font-family:arial black;
+    font-size:200%;
+    background-position-x:center;
+    background-position-y:center;
+    background-repeat:no-repeat;
+    background-image:url(http://i.imgur.com/3QGAU.png);
+    border-color: #fff;
+    border-width: 2px;
+    border-style: solid;
+    box-shadow: 0 0 2px 1px #aaa;
+}
+.menu li {
+    /*background:#000;*/
+    color:#fff;
+    font-size:25px;
+}
+.menu a{
+    text-decoration: none;
+    color:#fff;
+}
+#menu16 {
+    -webkit-transform-origin: 17px 17px;
+    -moz-transform-origin: 17px 17px;
+    -o-transform-origin: 17px 17px;
+    transform-origin: 17px 17px;
+
+    -webkit-transition: all .5s ease;
+    -moz-transition: all .5s ease;
+    -o-transition: all .5s ease;
+    transition: all .5s ease;
+
+    -webkit-transform: rotate(180deg);
+    -moz-transform: rotate(180deg);
+    -o-transform: rotate(180deg);
+    transform: rotate(180deg);
+}
+#menu16.circleMenu-open {
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+}
+#menu16.circleMenu-open > li:first-child {
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+:not(#menu16).circleMenu-open > li:first-child {
+    -webkit-transform: rotate(315deg);
+    -moz-transform: rotate(315deg);
+    -o-transform: rotate(315deg);
+    transform: rotate(315deg);
+}
+
+nav{
+    width:200px;
+    float:left;
+}
+nav ul{
+    list-style:none;
+    padding:0;
+    margin:0;
+}
+nav a{
+    display:block;
+    text-decoration:none;
+}
+nav a.active{
+    background:blue;
+    color:#fff;
+}
+#examples {
+    margin-left:200px;
+}
+
+#examples > div {
+    display:none;
+    width:300px;
+    height:300px;
+    border:1px solid black;
+    position:relative;
+    overflow:hidden;
+}
+
+.menu{position:absolute;}
+
+#menu2, #menu14, #menu15, #menu16{
+    left:135px;
+    top:135px;
+}
+#menu3{
+    right:4px;
+    bottom:34px;
+}
+#menu4{
+    top:0;
+    right:4px;
+}
+#menu5{
+    bottom:34px;
+    left:0;
+}
+#menu6, #menu10{
+    top:0;
+    left:135px;
+}
+#menu7, #menu11{
+    top:135px;
+    left:0;
+}
+#menu8, #menu12{
+    bottom:34px;
+    left:135px;
+}
+#menu9, #menu13{
+    top:135px;
+    right:4px;
+}

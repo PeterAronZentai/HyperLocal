@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<!--[if IE 8]> 				 <html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!-->
+<!--<html class="no-js" lang="en" xmanifest="cache.manifest">-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=0" />
+    <script src="js/vendor/jquery2b3.js"></script>
+    <script src="http://include.jaydata.org/jaydata.js"></script>
+    <style>
+        body {
+            margin: 0px 0px 0px 0px;
+
+        }
+
+    </style>
+    <script>
+
+        $data.Entity.extend('Chefkoch.Cookbook.v2.Ingredient', {
+            'id': { key: false, type: 'Edm.Int32', nullable: false, required: true },
+            'name': { key: false, type: 'Edm.String', nullable: false, required: true },
+            'unit': { key: false, type: 'Edm.String', nullable: false, required: true },
+            'amount': { key: false, type: 'Edm.Decimal', nullable: false, required: true }
+        });
+
+        $data.Entity.extend('Chefkoch.Cookbook.v2.Recipe', {
+            'id': { key: true, type: 'Edm.String', nullable: false, required: true },
+
+            'ingredients': {
+                type: 'Array', elementType: 'Chefkoch.Cookbook.v2.Ingredient', sqLite: {
+                    fromDb: function (value, memberDefinition, context, type) {
+                        return (value ? JSON.parse(value) : undefined);
+                    },
+                    toDb: function (value, memberDefinition, context, type) {
+                        return (value ? JSON.stringify(value) : undefined);
+                    }
+
+                }
+            }
+        });
+
+
+        $data.EntityContext.extend("ItemContext", {
+            Items: { type: $data.EntitySet, elementType: 'Chefkoch.Cookbook.v2.Recipe' }
+        });
+
+
+    </script>
+
+    
+</head>
+<body>
+    <div class="stuff" style="position:absolute;background-color:whitesmoke;float:left">
+    </div>
+    <div>
+        <a class="presser" href="#">Press</a>
+    </div>
+ </body>
+</html>

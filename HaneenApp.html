@@ -1,0 +1,29 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="http://include.jaydata.org/datajs-1.0.3.js"></script>"
+    <script src="http://include.jaydata.org/jaydata.js"></script>
+    <script>
+
+        //$data.initService("https://open.jaystack.net/7cd17264-673d-48ab-ac81-12a9df55b0a7/2db09b92-8ddd-4689-8b35-ed6c99391382/api/myDB")
+        $data.initService("https://dev-open.jaystack.net/a11d6738-0e23-4e04-957b-f14e149a9de8/1162e5ee-49ca-4afd-87be-4e17c491140b/api/mydatabase")
+             .then(function (mydb) {
+
+                 mydb.HaneenTable
+                     //.filter("it.des === 'Rome'")
+                     .forEach(function (item) {
+                         $('#output').append('<div>' + item.ADate.getYear() + ":" + item.ADate.getMonth() + '</div>');
+                         console.log(item);
+                     });
+                 //work with mydb here
+             });
+    </script>
+</head>
+<body>
+    <div id="output">
+
+    </div>
+</body>
+</html>

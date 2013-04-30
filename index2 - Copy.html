@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<!--[if IE 8]> 				 <html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!-->
+<!--<html class="no-js" lang="en" xmanifest="cache.manifest">-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+
+    <title>HyperLocal</title>
+    <script src="js/vendor/custom.modernizr.js"></script>
+    <!--<link rel="stylesheet" href="css.css" />-->
+
+    <link rel="stylesheet" href="css/normalize.css" />
+    <link rel="stylesheet" href="css/foundation.css" />
+    <link rel="stylesheet" href="css/general_foundicons.css" />
+
+    <link rel="stylesheet" href="css/style.css" />
+
+    <link href="awesomefont/css/font-awesome.css" rel="stylesheet" />
+
+    <link href="leafletjs/leaflet.css" rel="stylesheet" />
+    <link href="leafletjs/leaflet.awesome-markers.css" rel="stylesheet" />
+    <link href="leafletjs/cluster.css" rel="stylesheet" />
+    <link href="leafletjs/L.Control.Locate.css" rel="stylesheet" />
+    <link href="js/toastr.css" rel="stylesheet" />
+    <link href="js/toastr-responsive.css" rel="stylesheet" />
+</head>
+<body>
+
+    <div class="row row-full">
+        <div style='text-align:center;padding-top:20px;'>
+            <button onclick='window.swipe.prev()'>prev</button> 
+            <button onclick='window.swipe.next()'>next</button>
+        </div>
+        <div id="swipe" class="swipe">
+            <div id="row-full2"  class='swipe-wrap'>
+                <div>
+                    <div class="large-3 three columns left-column">
+                        <form>
+                            <div class="row">
+                                <div class="large-12 columns box-padding-medium">
+                                    <div class="row collapse">
+                                        <div class="small-12 columns relative">
+                                            <i class="general foundicon-search absolute"></i>
+                                            <input type="text" id="searchInput" class="input-search" data-link="query" placeholder="Search here...">
+                                            <div class="abs-right color-gray"><script type="text/x-jsrender">{^{> items.length}}</script></div>
+                                        </div>
+                                    </div>
+                                    <div class="row collapse relative overscroll">
+                                        <div id="listcontainer">
+                                            <script type="text/x-jsrender">
+                                                {{include tmpl="#poiListTemplate"/}}
+                                            </script>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div>
+                    <div class="large-9 columns reset-padding relative box-shadow">
+                        <i class="gen-enclosed foundicon-location toggle-map show-for-small" onclick="toggleMap()"></i>
+                        <div id="map" class="map"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="box-padding-high box-white right-panel hidden box-shadow overscroll">
+                         <i class="foundicon-remove absolute button medium close-editor-command"></i>
+                        <div id="poiEditor">
+                            <script type="text/x-jsrender">
+                                {{include tmpl="#poiEditorTemplate"/}}
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script id="mainTemplate" type="text/x-jsrender">
+        {{include tmpl="#addNewDialogTemplate"/}}
+        {{include tmpl="#operationErrorTemplate"/}}
+    </script>
+
+    <div id="login" class="reveal-modal small">
+        <div id="row">
+            <h3>Editing requires authentication</h3>
+            <div class="large-4 columns">
+                <a href="#" onclick="doLogin('facebook');">Facebook</a>
+            </div>
+            <div class="large-4 columns">
+                <a href="#" onclick="doLogin('google');">Google</a>
+            </div>
+            <div class="large-4 columns">
+                <a href="#" onclick="closeLoginPopup()">Cancel</a>
+            </div>
+        </div>
+    </div>
+
+    <script id="operationErrorTemplate" type="text/x-jsrender">
+        <div id="opError" class="reveal-modal medium" style="z-index:1000">
+            <a class="close-reveal-modal">&#215;</a>
+            <div class="row">
+                <div class="large-12 columns">
+                    <h3>Modification rejected</h3>
+                    {^{if error}}
+                        {^{for error}}
+                            {^{for data}}
+                            <h4>{{> message}}</h4>
+                            {{/for}}
+                        {{/for}}
+                    {{/if}}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="large-6 columns">
+                    <a href="#" class="button prefix cancel-error-command">OK</a>
+                </div>
+                <div class="large-6 columns">
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script id="addNewDialogTemplate" type="text/x-jsrender">
+        <div id="addNewPoint" class="reveal-modal medium" style="z-index:1000">
+            <div class="row">
+                <div class="large-12 columns">
+                    <h1 class="show-for-xlarge">Add a new point</h1>
+                    <h3 class="show-for-medium hide-for-large-up">Add point</h3>
+                </div>
+            </div>
+            <div class="row">
+                {^{for selectedPoint}}
+                    <div class="large-6 columns" data-bind="with: poi">
+                        <label>Name </label>    
+                        {^{for record}}
+                            <input type="text" placeholder="Name of place"  data-link="name"/>
+                        {{/for}}    
+                    </div>
+                {{/for}}
+                <div class="large-6 columns">
+                    {^{for newAddress tmpl="#selectAddressTemplate" /}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="large-4 small-5 columns">
+                    <a href="#" class="button prefix ok-command">OK</a>
+                </div>
+                <div class="large-4 small-2 columns"></div>
+                <div class="large-4 small-5 columns">
+                  <a href="#" class="button prefix cancel-command">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script id="selectAddressTemplate" type="text/x-jsrender">
+    <label>Address</label>
+        {^{if #data}}
+            <input type="text" readonly placeholder="Name of place"  data-link="Address.FormattedAddress"/>
+        {{else}}
+            <input type="text" readonly placeholder="Name of place"  value="resolving address from coordinates"/>
+        {{/if}}
+    </script>
+
+    <script type="text/x-jsrender" id="poiTemplate">
+        <li data-link="css-background-color{:~bgColor(~app.selectedPoint)}" >
+            {^{> record.name}} 
+            {^{if ~app.selectedPoint === #data}}
+                {^{if ~app.editorVisible}}
+                    <a href="#" class="button small close-editor-command" style="float:right">Close</a>
+                {{else}}
+                    <a href="#" class="edit-command button small" style="float:right">Edit</a>
+                {{/if}}
+            {{/if}}
+        </li>
+    </script>
+
+    <script type="text/x-jsrender" id="poiListTemplate">
+      <ul id="list" class="main-list">
+          {^{for items tmpl="#poiTemplate" /}}
+      </ul>
+    </script>
+
+    <script type="text/x-jsrender" id="popupTemplate">
+        <div >
+            <div class="popup-bubble">{^{> record.name}}</div>
+        </div>
+    </script>
+
+    <script type="text/x-jsrender" id="poiEditorTemplate">
+        {^{if selectedPoint}}
+        {^{for selectedPoint}}
+        <form>
+            <fieldset>
+              <legend>Title</legend>
+              <div class="row">
+                <div class="large-12 columns">
+                  <input type="text" class="input-edit" placeholder="Name your point" data-link="record.name">
+                </div>
+              </div>
+            </fieldset>
+            <fieldset>
+                <legend>Taxonomy</legend>
+                <div class="row">
+                  <div class="large-6 columns">
+                    <label>Category</label>
+                    <input type="text" data-link="record.cat" placeholder="Category">
+                  </div>
+                  <div class="large-6 columns">
+                    <label>SubCat</label>
+                    <input type="text" data-link="record.subcat" placeholder="Subcategory">
+                  </div>
+                </div>
+                  <div class="row">
+                  <div class="large-12 columns">
+                    <label>Type</label>
+                    <input type="text" data-link="record.type" placeholder="Type">
+                  </div>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Address</legend>
+                <div class="row">
+                  <div class="large-6 columns">
+                    <label>Address</label>
+                    <input type="text" data-link="record.addr" placeholder="Street address">
+                  </div>
+                  <div class="large-6 columns">
+                    <label>Phone</label>
+                    <input type="text" data-link="record.phone" placeholder="large-4.columns">
+                  </div>
+                </div>
+                <div class="row">
+                   <div class="large-4 columns">
+                    <label>ZIP/Postal</label>
+                    <input type="text" data-link="record.postal" placeholder="large-4.columns">
+                  </div>
+                   <div class="large-4 columns">
+                    <label>City</label>
+                    <input type="text" data-link="record.city" placeholder="large-4.columns">
+                  </div>
+                   <div class="large-4 columns">
+                    <label>Country</label>
+                    <input type="text" data-link="record.country" placeholder="large-4.columns">
+                  </div>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Location</legend>
+            <div class="row">
+                  <div class="small-6 columns">
+                      <label>Latitude</label>
+                    <input type="text" data-link="record.lat" placeholder="small-9.columns">
+                  </div>
+                  <div class="small-6 columns">
+                      <label>Longitude</label>
+                    <input type="text" data-link="record.lon" placeholder="small-9.columns">
+                  </div>
+            </div>
+            </fieldset>
+            <div class="row">
+                {^{if save}}
+                <div class="large-6 columns">
+                    <a href="#" class="button prefix save-command">Save</a>
+                </div>
+                {{/if}}
+                {^{if isNew}}
+                <div class="large-6 columns">
+                  <a href="#" class="button prefix alert cancel-command">Cancel</a>
+                </div>
+                {{else}}
+                <div class="large-6 columns">
+                  <a href="#" class="button prefix alert remove-command">Remove</a>
+                </div>
+                {{/if}}
+            </div>
+        </form>
+        {{/for}}
+        {{/if}}
+    </script>
+
+    <script src="js/socket.io.js"></script>
+    <!--<script src="js/vendor/jquery2b3.js"></script>-->
+    <script src="js/vendor/jquery.js"></script>
+    <script src="js/toastr.js"></script>
+    <script src="js/vendor/jsrender.js"></script>
+    <script src="js/vendor/jquery.observable.js"></script>
+    <script src="js/vendor/jquery.views.js"></script>
+    <script src="js/jaydata/datajs-1.0.3-patched.js"></script>
+    <script src="js/jaydata/jaydata.js"></script>
+    <script src="js/foundation.min.js"></script>
+    <script src="js/vendor/swipe.js"></script>
+    <!--<script src="js/vendor/iscroll.js"></script>-->
+
+    <script src="leafletjs/leaflet.js"></script>
+    <script src="leafletjs/leaflet.awesome-markers.js"></script>
+    <script src="leafletjs/BingLayer.js"></script>
+    <script src="leafletjs/latest/cluster.js"></script>
+    <script src="TraceLayer.js"></script>
+    <script src="OptionsLayer.js"></script>
+    <script src="leafletjs/L.Control.Locate.js"></script>
+
+    <script src="js/hello.min.js"></script>
+    <script src="js/ui2.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+    <!--<script src="js.js"></script>-->
+
+    <script>
+        $(document).foundation().foundation('reveal', {
+            closeOnBackgroundClick: false,
+            animation: 'fadeAndPop',
+            animationSpeed: 0,
+            css: {
+                open: {
+                    'opacity': 1,
+                    'visibility': 'visible',
+                    'display': 'block'
+                },
+                close: {
+                    'opacity': 0,
+                    'visibility': 'hidden',
+                    'display': 'none'
+                }
+            }
+        });
+
+        $(document).ready(function(){
+            /*document.getElementById('swipe').style.maxWidth = window.innerWidth - 40 + "px";
+            document.getElementById('row-full').style.width = window.innerWidth - 40 + "px";*/
+            document.querySelector('.swipe-wrap').style.height = window.innerHeight - 120 + "px"
+
+            // SWIPE with pure JS
+            var elem = document.getElementById('swipe');
+            window.swipe = Swipe(elem, {
+                startSlide: 1,
+                // auto: 3000,
+                continuous: false,
+                // disableScroll: true,
+                // stopPropagation: true,
+                // callback: function(index, element) {},
+                // transitionEnd: function(index, element) {}
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<!--[if IE 8]> 				 <html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!-->
+<!--<html class="no-js" lang="en" xmanifest="cache.manifest">-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=0" />
+    <script src="js/vendor/jquery2b3.js"></script>
+    <link href="leafletjs/leaflet.css" rel="stylesheet" />
+    <script src="js/vendor/swipe.js"></script>
+        <script src="leafletjs/leaflet.js"></script>
+    <script src="leafletjs/leaflet.awesome-markers.js"></script>
+    <script src="leafletjs/BingLayer.js"></script>
+
+    <style>
+        body {
+            margin: 0px 0px 0px 0px;
+
+        }
+
+        .stuff {
+            opacity: 1;
+            -moz-transition: all 1s ease-in-out;
+            -o-transition: all 1s ease-in-out;
+            -webkit-transition: all 1s ease-in-out;
+            transition: all 1s ease-in-out;
+            left:100px;
+            top:0;
+            height:150px;
+            width:150px;
+        }
+        .hide {
+            opacity: 0;
+            -moz-transform: translate3d(0,-100%,0);
+            -ms-transform: translate3d(0,-100%,0);
+            -o-transform: translate3d(0,-100%,0);
+            -webkit-transform: translate3d(0,-100%,0);
+            transform: translate3d(0,-100%,0);
+        }
+    </style>
+    <script>
+        $(function () {
+
+        });
+        $(document).on("click", ".presser", function () {
+            $('.stuff').toggleClass('hide');
+        });
+    </script>
+
+    
+</head>
+<body>
+    <div class="stuff" style="position:absolute;background-color:whitesmoke;float:left">
+    </div>
+    <div>
+        <a class="presser" href="#">Press</a>
+    </div>
+ </body>
+</html>

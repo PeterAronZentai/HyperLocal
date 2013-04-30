@@ -1,0 +1,193 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{96E6131F-EE5F-4246-85A6-DCBB3B140ADB}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Pointer</RootNamespace>
+    <AssemblyName>Pointer</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="foundation4\css\foundation.css" />
+    <Content Include="foundation4\css\foundation.min.css" />
+    <Content Include="foundation4\css\normalize.css" />
+    <Content Include="foundation4\humans.txt" />
+    <Content Include="foundation4\index.html" />
+    <Content Include="foundation4\js\foundation.min.js" />
+    <Content Include="foundation4\js\foundation\foundation.alerts.js" />
+    <Content Include="foundation4\js\foundation\foundation.clearing.js" />
+    <Content Include="foundation4\js\foundation\foundation.cookie.js" />
+    <Content Include="foundation4\js\foundation\foundation.dropdown.js" />
+    <Content Include="foundation4\js\foundation\foundation.forms.js" />
+    <Content Include="foundation4\js\foundation\foundation.joyride.js" />
+    <Content Include="foundation4\js\foundation\foundation.js" />
+    <Content Include="foundation4\js\foundation\foundation.magellan.js" />
+    <Content Include="foundation4\js\foundation\foundation.orbit.js" />
+    <Content Include="foundation4\js\foundation\foundation.placeholder.js" />
+    <Content Include="foundation4\js\foundation\foundation.reveal.js" />
+    <Content Include="foundation4\js\foundation\foundation.section.js" />
+    <Content Include="foundation4\js\foundation\foundation.tooltips.js" />
+    <Content Include="foundation4\js\foundation\foundation.topbar.js" />
+    <Content Include="foundation4\js\vendor\custom.modernizr.js" />
+    <Content Include="foundation4\js\vendor\jquery.js" />
+    <Content Include="foundation4\js\vendor\zepto.js" />
+    <Content Include="foundation4\robots.txt" />
+    <Content Include="index.html" />
+    <Content Include="jaydata\CREDITS.txt" />
+    <Content Include="jaydata\datajs-1.0.3-patched.js" />
+    <Content Include="jaydata\datajs-1.1.0.min.js" />
+    <Content Include="jaydata\GPL-LICENSE.txt" />
+    <None Include="jaydata\jaydata-vsdoc.js" />
+    <Content Include="jaydata\jaydata.d.ts" />
+    <Content Include="jaydata\jaydata.js" />
+    <Content Include="jaydata\jaydata.min.js" />
+    <Content Include="jaydata\jaydatamodules\deferred.js" />
+    <Content Include="jaydata\jaydatamodules\deferred.min.js" />
+    <Content Include="jaydata\jaydatamodules\errorhandler.js" />
+    <Content Include="jaydata\jaydatamodules\errorhandler.min.js" />
+    <Content Include="jaydata\jaydatamodules\formBinder.js" />
+    <Content Include="jaydata\jaydatamodules\formBinder.min.js" />
+    <Content Include="jaydata\jaydatamodules\handlebars.js" />
+    <Content Include="jaydata\jaydatamodules\inMemory.js" />
+    <Content Include="jaydata\jaydatamodules\inMemory.min.js" />
+    <Content Include="jaydata\jaydatamodules\kendo.js" />
+    <Content Include="jaydata\jaydatamodules\kendo.min.js" />
+    <Content Include="jaydata\jaydatamodules\knockout.js" />
+    <Content Include="jaydata\jaydatamodules\knockout.min.js" />
+    <Content Include="jaydata\jaydatamodules\qDeferred.js" />
+    <Content Include="jaydata\jaydatamodules\qDeferred.min.js" />
+    <Content Include="jaydata\jaydatamodules\sencha.js" />
+    <Content Include="jaydata\jaydatamodules\sencha.min.js" />
+    <Content Include="jaydata\jaydatamodules\template.js" />
+    <Content Include="jaydata\jaydatamodules\template.min.js" />
+    <Content Include="jaydata\jaydatamodules\validate.js" />
+    <Content Include="jaydata\jaydatamodules\validate.min.js" />
+    <Content Include="jaydata\jaydataproviders\FacebookProvider.js" />
+    <Content Include="jaydata\jaydataproviders\FacebookProvider.min.js" />
+    <Content Include="jaydata\jaydataproviders\IndexedDbProvider.js" />
+    <Content Include="jaydata\jaydataproviders\IndexedDbProvider.min.js" />
+    <Content Include="jaydata\jaydataproviders\InMemoryProvider.js" />
+    <Content Include="jaydata\jaydataproviders\InMemoryProvider.min.js" />
+    <Content Include="jaydata\jaydataproviders\MongoDbProvider.js" />
+    <Content Include="jaydata\jaydataproviders\MongoDbProvider.min.js" />
+    <Content Include="jaydata\jaydataproviders\oDataProvider.js" />
+    <Content Include="jaydata\jaydataproviders\oDataProvider.min.js" />
+    <Content Include="jaydata\jaydataproviders\SqLiteProvider.js" />
+    <Content Include="jaydata\jaydataproviders\SqLiteProvider.min.js" />
+    <Content Include="jaydata\jaydataproviders\StormProvider.js" />
+    <Content Include="jaydata\jaydataproviders\StormProvider.min.js" />
+    <Content Include="jaydata\jaydataproviders\WebApiProvider.js" />
+    <Content Include="jaydata\jaydataproviders\WebApiProvider.min.js" />
+    <Content Include="jaydata\jaydataproviders\YQLProvider.js" />
+    <Content Include="jaydata\jaydataproviders\YQLProvider.min.js" />
+    <Content Include="jaydata\MIT-LICENSE.txt" />
+    <Content Include="jquery\jquery-1.9.1.js" />
+    <Content Include="jquery\jquery-1.9.1.min.js" />
+    <Content Include="jquery\jquery-migrate-1.1.1.js" />
+    <Content Include="jquery\jquery-migrate-1.1.1.min.js" />
+    <Content Include="knockoutjs\knockout-2.2.1.js" />
+    <Content Include="leafletjs\images\layers.png" />
+    <Content Include="leafletjs\images\marker-icon%402x.png" />
+    <Content Include="leafletjs\images\marker-icon.png" />
+    <Content Include="leafletjs\images\marker-shadow.png" />
+    <Content Include="leafletjs\leaflet-src.js" />
+    <Content Include="leafletjs\leaflet.css" />
+    <Content Include="leafletjs\leaflet.ie.css" />
+    <Content Include="leafletjs\leaflet.js" />
+    <Content Include="main.js" />
+    <Content Include="Web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="foundation4\img\.gitkeep" />
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>0</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:61028/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

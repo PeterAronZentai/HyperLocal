@@ -1,0 +1,308 @@
+﻿<!DOCTYPE html>
+<!--[if IE 8]> 				 <html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!-->
+<!--<html class="no-js" lang="en" xmanifest="cache.manifest">-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+
+    <title>HyperLocal</title>
+
+<!--    <link rel="stylesheet" href="css.css" />-->
+<!--    <link href="css/accessibility_foundicons.css" rel="stylesheet" />-->
+
+    <script src="geohash.js"></script>
+    <script src="js/vendor/custom.modernizr.js"></script>
+    <link href="leafletjs/leaflet.css" rel="stylesheet" />
+    <link href="leafletjs/leaflet.awesome-markers.css" rel="stylesheet" />
+    <link href="leafletjs/cluster.css" rel="stylesheet" />
+    <link href="leafletjs/L.Control.Locate.css" rel="stylesheet" />
+<!--    <link href="css/circle-menu.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/normalize.css" />
+    <link rel="stylesheet" href="css/foundation.css" />
+    <link rel="stylesheet" href="css/general_foundicons.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link href="awesomefont/css/font-awesome.css" rel="stylesheet" />
+    <link href="leafletjs/leaflet.css" rel="stylesheet" />
+    <link href="leafletjs/leaflet.awesome-markers.css" rel="stylesheet" />
+    <link href="leafletjs/cluster.css" rel="stylesheet" />
+    <link href="leafletjs/L.Control.Locate.css" rel="stylesheet" />
+    <link href="js/toastr.css" rel="stylesheet" />
+    <link href="js/toastr-responsive.css" rel="stylesheet" />-->
+    <style>
+    </style>
+
+    <script>
+    </script>
+</head>
+<body>
+
+
+
+    <script src="js/socket.io.js"></script>
+    <script src="js/vendor/jquery2b3.js"></script>
+    <script src="js/toastr.js"></script>
+    <script src="js/vendor/jsrender.js"></script>
+    <script src="js/vendor/jquery.observable.js"></script>
+    <script src="js/vendor/jquery.views.js"></script>
+    <script src="js/jaydata/datajs-1.0.3-patched.js"></script>
+    <script src="http://include.jaydata.org/1.3.0beta/jaydata.js"></script>
+
+
+    <script src="leafletjs/leaflet.js"></script>
+    <script src="leafletjs/leaflet.awesome-markers.js"></script>
+    <script src="leafletjs/BingLayer.js"></script>
+    <script src="leafletjs/cluster.js"></script>
+    <script src="Scripts/rx.js"></script>
+    <script src="Scripts/rx.aggregates.js"></script>
+    <script src="Scripts/rx.binding.js"></script>
+    <script src="Scripts/rx.coincidence.js"></script>
+    <script src="Scripts/rx.joinpatterns.js"></script>
+    <script src="Scripts/rx.time.js"></script>
+    <script src="Scripts/rx.html.js"></script>
+    Input:<input id="myinp" /><br />
+    <button id="getData">Press me</button>
+    <div id="output"></div>
+    <div id="map" style="width:500px;height:400px;">
+
+    </div>
+    <script>
+        $(function () {
+        });
+
+    </script>
+    <script type="text/x-jsrender" id="poiList">
+        <div>{{> lat }},{{> lon }}, {{> geoHash }}</div>
+    </script>
+    <ul id="list">
+
+    </ul>
+    <script>
+        $(function () {
+            bingKey = 'AmpN66zZQqp8WpszBYibPXrGky0EiHLPT75WtuA2Tmj7bS4jgba1Wu23LJH1ymqy';
+            lmap = new L.Map('map', {
+                center: new L.LatLng(40.72121341440144, -74.00126159191132),
+                maxZoom: 19,
+                zoomControl: !(L.Browser.mobile),
+                zoom: 15
+            });
+            lmap.attributionControl.addAttribution("JayStack.com ©");
+            var bing = new L.BingLayer(bingKey, { maxZoom: 19 });
+            bing.addTo(lmap);
+            var l;
+            function dragOne() {
+                console.dir(arguments);
+                    $('#output').append(".");
+            }
+
+            //lmap.nodeName = 'map';
+            
+            //q = Rx.Observable
+            //      .fromEvent(lmap, "drag")
+            //      .delay(400)
+            //      .take(1)
+            //      .repeat();
+            //      //.merge(Rx.Observable.empty().delay(100))
+            //      //.repeat();
+            
+                  
+                  
+
+            //q.subscribe(dragOne);
+            //lmap.addEventListener("drag", dragOne);
+
+            //lmap.on("click", function (e) {
+            //    var gh = encodeGeoHash(e.latlng.lat, e.latlng.lng);
+            //    var gh_pref = gh.substr(0, 7);
+            //    if (l) { lmap.removeLayer(l); }
+            //    l = L.layerGroup();
+            //    gc.GeoRows.filter("it.geoHash.substr(1,7) === gh", { gh: gh_pref }).take(20)
+            //      .forEach(function (item) {
+            //          var m = L.marker([item.lat, item.lon]);
+            //          l.addLayer(m);
+            //      }).then(function () {
+            //          lmap.addLayer(l);
+            //      });
+
+            //});
+
+        });
+
+        function getAsQueryString(o) {
+            var qryStr = '';
+
+            Object.keys(o).forEach(function (key) {
+                if (qryStr) {
+                    qryStr += "&";
+                }
+                qryStr += key + "=" + encodeURIComponent(o[key]);
+            });
+            qryStr += "&callback=?"
+            return qryStr;
+        };
+
+        function search(options) {
+            var query;
+
+            if (options.bounds) {
+                var lb = options.bounds.getSouthWest();
+                var rt = options.bounds.getNorthEast();
+                query = {
+                    lb_lat: lb.lat,
+                    lb_lng: lb.lng,
+                    rt_lat: rt.lat,
+                    rt_lng: rt.lng
+                }
+            } else {
+                var center = options.center;
+                query = {
+                    ct_lat: center.lat,
+                    ct_lng: center.lng,
+                    radius: options.radius
+                }
+            }
+
+            $.extend(query, {
+                q: options.q || 'hyp3r',
+                limit: options.limit || 1000,
+                fuzzy: options.fuzzy || 0,
+                start: options.start || 0
+            });
+
+
+            url = "http://hyperlocal.redth.info/search?" + getAsQueryString(query);
+
+
+
+            return new $.Deferred(function (newDefer) {
+                            $.getJSON(url, newDefer.resolve);
+                    });
+        }
+
+        var Point = $data.define("GeoTable", {
+            record_id: String,
+            name: String,
+            lat: Number,
+            lon: Number,
+            geoHash: String
+        });
+
+        var GeoContext = $data.EntityContext.extend("GeoDB", {
+            Points: { type: $data.EntitySet, elementType: Point }
+        });
+
+        var svcUrl = "http://127.0.0.1:6789/svc";
+
+        $('#getData').on('click', function () {
+            //doSearch({ bounds: lmap.getBounds(), start: 0 }, gc);
+            $.getJSON("p.json", function () {
+                alert("done!");
+            });
+            //sync(fromSet, toSet);
+        });
+
+        $data.initService(svcUrl).then(function (remote) {
+            var local = new GeoContext({ provider: 'local' });
+            $.when(local.read).then(function () {
+                var fromSet = remote.Points.withInlineCount().take(1000);
+                var toSet = local.Points;
+                $('#getData').on('click', function () {
+                    //doSearch({ bounds: lmap.getBounds(), start: 0 }, gc);
+                    $.getJSON("poinst.json", function () {
+                        alert("done!");
+                    });
+                    //sync(fromSet, toSet);
+                });
+            });
+            //gc.Points.withInlineCount().take(10).toArray(function () {
+            //    console.log(arguments);
+            //});
+        });
+        var savedTotal = 0;
+
+
+        function doSync(items, toSet, sofar) {
+            var newItems = items.map(function (item) { return {
+                    record_id: item.record_id,
+                    name: item.name, 
+                    lat: item.lat,
+                    lon: item.lon,
+                    geoHash: item.geoHash
+                }
+            });
+
+            toSet.addMany(newItems);
+            toSet.saveChanges()
+                 .then(function () {
+                     $('#output').append('.');
+                     if (items.length > 0) {
+                         items.next().then(function (items) {
+                             doSync(items, toSet, sofar + items.length);
+                         });
+                     }
+                 });
+        }
+
+        function cont() { }
+
+        function sync(fromSet, toSet) {
+            fromSet.toArray().then(function (items) {
+                doSync(items, toSet, items.length);
+            });
+        }
+
+
+        function doSearch(options, targetDb) {
+
+            var gc = targetDb;
+
+            search(options).then(function (result) {
+                console.log(result);
+
+                var localData = [];
+                $('#output').append("<li>Downloaded: " + (result.offset + 1000) + "</li>");
+
+                result.results.forEach(function (r) {
+                    localData.push({
+                        record_id: r.record_id,
+                        name: r.record.name,
+                        geoHash: encodeGeoHash(r.record.lat, r.record.lon),
+                        lat: r.record.lat,
+                        lon: r.record.lon,
+                        data: r.record
+                    });
+
+                });
+
+                gc.PointsLarge.addMany(localData);
+
+                gc.saveChanges().then(function () {
+                    $('#output').append("<li>Saved: " + (savedTotal += 1000) + "</li>");
+                }).fail(function (e) {
+                    $('#output').html(JSON.stringify(e));
+                });
+
+
+                if (result.offset < result.results_found) {
+                    options.start += 1000;
+                    doSearch(options, gc);
+                }
+
+            });
+        }
+
+        //$.when(gc.ready).then(function () {
+        //    alert("service started");
+        //    $('#getData').on('click', function () {
+        //        doSearch({ bounds: lmap.getBounds(), start: 0 });
+        //    });
+        //});
+    </script>
+
+</body>
+</html>

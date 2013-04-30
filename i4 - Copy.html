@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<!--[if IE 8]> 				 <html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!-->
+<!--<html class="no-js" lang="en" xmanifest="cache.manifest">-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=0" />
+    <script src="js/vendor/custom.modernizr.js"></script>
+    <script src="js/vendor/jquery2b3.js"></script>
+    <script src="js/jaydata/jaydata.js"></script>
+    <link href="leafletjs/leaflet.css" rel="stylesheet" />
+    <script src="js/vendor/swipe.js"></script>
+        <script src="leafletjs/leaflet.js"></script>
+    <script src="leafletjs/leaflet.awesome-markers.js"></script>
+    <script src="leafletjs/BingLayer.js"></script>
+    <script src="OptionsLayer.js"></script>
+    <style>
+        body {
+            margin: 0px 0px 0px 0px;
+            padding: 0px 0px 0px 0px;
+        }
+
+        ul {
+            -webkit-margin-before: 0px;
+        }
+        #scroller > * { -webkit-transform: translateZ(0px); }
+        .swipe {
+          overflow: hidden;
+          visibility: hidden;
+          position: relative;
+        }
+        .swipe-wrap {
+          overflow: hidden;
+          position: relative;
+        }
+        .swipe-wrap > div {
+          float:left;
+          width: 100%;
+          position: relative;
+        }
+
+        .scroll {
+            overflow:scroll;
+        }
+
+        body.apple .scroll {
+            -webkit-overflow-scrolling: touch;
+        }
+
+
+        li {
+            background-color: gold;
+            width:100px;
+            height:80px;
+            float:left;
+        }
+    </style>
+    <script>
+      $(function () {
+          var viewHeight;
+          document.body.style.backgroundColor = 'teal';
+          document.body.style.height = window.innerHeight + "px";
+          document.getElementById('slider').style.height = window.innerHeight + "px";
+          $('.swipe-wrap').height(window.innerHeight);
+          $('.side').height(window.innerHeight);
+          document.getElementById('map').style.height = (window.innerHeight) + "px";
+          //$('#longList').height(window.innerHeight);
+          var ua = window.navigator.userAgent.toLowerCase();
+
+          if (window.navigator.userAgent.toLowerCase().indexOf("os x") > -1) {
+              $(document.body).addClass("apple");
+          }
+          swiper = Swipe(document.getElementById('slider'));
+          bingKey = 'AmpN66zZQqp8WpszBYibPXrGky0EiHLPT75WtuA2Tmj7bS4jgba1Wu23LJH1ymqy';
+          lmap = new L.Map('map', { center: new L.LatLng(40.72121341440144, -74.00126159191132), maxZoom: 19, zoom: 15 });
+          var bing = new L.BingLayer(bingKey, { maxZoom: 19 });
+          new $data.NetworkIndicator().addTo(lmap);
+          bing.addTo(lmap);
+          for (var i = 0; i < 200; i++) {
+              $('#items').append('<li><a href="#">' + i + " item</a></li>");
+          }
+
+          $(document).on('click', 'li', function () {
+              swiper.next();
+          });
+          //alert('WebkitOverflowScrolling' in $('.scroll')[0].style);
+
+          //$('#slider').append("<div>!!!!!</div>");
+      });
+
+        window.onresize = function () {
+            document.body.style.height = window.innerHeight + "px";
+            document.getElementById('slider').style.height = window.innerHeight + "px";
+            $('.swipe-wrap').height(window.innerHeight);
+            $('.side').height(window.innerHeight);
+            document.getElementById('map').style.height = (window.innerHeight) + "px";
+            //$('#longList').height(window.innerHeight);
+            //document.getElementById('map').style.height = (window.innerHeight - 20) + "px";
+            //document.getElementById('map').style.width = (window.innerWidth) + "px";
+            console.log(window.innerHeight, document.body.offsetHeight);
+        }
+        //document.body.onresize = function () {
+        //    console.log(window.innerHeight);
+        //    document.body.style.height = window.innerHeight + "px";
+        //}
+
+    </script>
+
+    
+</head>
+<body>
+<div id='slider' class='swipe' style="background-color:goldenrod">
+    <div class='swipe-wrap'>
+        <div class="side" id="map" style="width:400px;float:left;background-color:red;">
+        </div>
+        <div class="side" id="poiList" style="width:400px;float:left;padding: 0px 0px 0px 0px">
+            <ul class="side scroll" id="items">
+
+            </ul>
+        </div>
+        <div class="side" id="poiEditor" style="float:left;background-color:blueviolet">        
+        </div>
+    </div>
+</div>
+ </body>
+</html>

@@ -1,0 +1,5 @@
+c:\dev\Pointer\Pointer\bin\Pointer.dll
+c:\dev\Pointer\Pointer\bin\Pointer.pdb
+c:\dev\Pointer\Pointer\obj\Debug\Pointer.csprojResolveAssemblyReference.cache
+c:\dev\Pointer\Pointer\obj\Debug\Pointer.dll
+c:\dev\Pointer\Pointer\obj\Debug\Pointer.pdb

@@ -1,0 +1,296 @@
+body {
+	max-width: 100%;
+	width: 100%;
+	overflow: hidden !important;
+	-webkit-user-select:none;
+	-webkit-text-size-adjust:none;
+}
+
+.row-full { max-width: 100%; }
+.row-full .large-3 { height: 100%; }
+.map { height: 500px; }
+
+.box-padding-high 	{ padding: 35px 20px; }
+.box-padding-medium { padding: 20px; }
+
+.pull-right { float: right; }
+
+.box-white { background: #fff; }
+
+.relative { position: relative; }
+.absolute { position: absolute; }
+.reset-padding { padding: 0 !important; }
+
+.color-gray { color: gray; }
+
+.box-shadow {
+	-webkit-box-shadow: 0 0 15px #808080;
+	-moz-box-shadow: 0 0 15px #808080;
+	-o-box-shadow: 0 0 15px #808080;
+	box-shadow: 0 0 15px #808080;
+}
+
+.max-height-scroll {
+	max-height: 100%;
+}
+
+.reveal-modal.open {
+	z-index: 4500 !important;
+}
+
+.reveal-modal-bg {
+	z-index: 3200 !important;
+}
+
+.overscroll {
+	overflow-y: scroll;
+	overflow-x: hidden;
+}
+
+body.ios .overscroll {
+	-webkit-overflow-scrolling: touch;
+}
+
+body.ios .left-column .overscroll 		{  }
+body.android .left-column .overscroll 	{  }
+
+body.ios .right-panel.overscroll 		{  }
+body.android .right-panel.overscroll 	{ -webkit-overflow-scrolling: touch; }
+
+body.android .menu li:before, body.android .menu li a:before {
+	position: relative;
+	top: 2px;
+}
+body.android .menu li:first-child:before {
+	top: 1px;
+}
+
+.menu > li { -webkit-tap-highlight-color:rgba(0,0,0,0); }
+.menu li:first-child 			{ background-image: none; background-color: #041329; }
+.menu li:first-child:before 	{ font-size: 25px;position: relative; left: 0; top: -2px; }
+
+.menu li.menu-zoom-in 			{ background: #70A3EF !important; }
+.menu li.menu-zoom-out 			{ background: #4285EA !important; }
+.menu li.menu-edit      		{ background: #165ECA !important; }
+.menu li.menu-search 			{ background: #0E3E85 !important; }
+.menu li.menu-map 				{ background: #092857 !important; }
+
+.icon-screenshot:before 		{ font-size: 31px; position: relative; top: 2px; left: -7px; }
+
+.menu li.menu-edit.active-menu 	{ 
+	background: orange !important; 
+	border: 2px solid #fff; 
+	box-shadow: 0 0 2px 1px #AAA;
+}
+.menu li.menu-edit.active-menu .foundicon-edit {
+	position: relative; top: -2px;
+}
+
+.toast {
+	min-height: 60px;
+}
+
+/*================================================================= RIGHT COLUMN =================================================================*/
+.right-panel {
+	opacity: 1;
+	position: absolute !important; top: 0; right: 0; bottom: 0;
+	width: 100%; z-index: 4500;
+	max-width: 450px;
+
+	-webkit-transform: translateX(0);
+	-moz-transform: translateX(0);
+	-o-transform: translateX(0);
+	transform: translateX(0);
+
+	-webkit-transition: -webkit-transform 0.5s;
+	-moz-transition: -moz-transform 0.5s;
+	-o-transition: -o-transform 0.5s;
+	transition: transform 0.5s;
+}
+
+.right-panel.hidden {
+	-webkit-transform: translateX(100%);
+	-moz-transform: translateX(100%);
+	-o-transform: translateX(100%);
+	-ms-transform: translateX(100%);
+	transform: translateX(100%);
+	opacity: 1;
+}
+
+.right-panel h3 {
+	margin: 0 0 25px;
+}
+
+.right-panel .input-edit {
+	margin: 10px 0 0;
+	border: 1px solid #ddd; 
+	box-shadow: none;
+	font-size: larger; font-weight: bold;
+}
+
+.right-panel .foundicon-remove {
+	top: 20px; right: 20px;
+	z-index: 5000;
+}
+
+.right-panel form {
+	padding: 10px 15px;
+}
+
+.right-panel fieldset {
+	border: solid 1px #DDD;
+	background: rgba(219, 219, 219, 0.25);
+}
+
+.right-panel fieldset legend {
+	background: #FFF;
+	padding: 8px 10px;
+	border: 1px solid #DDD;
+}
+
+.right-panel label {
+	margin-bottom: 8px;
+}
+
+/*================================================================= LEFT COLUMN =================================================================*/
+.left-column {
+	height: 250px;
+}
+
+.large-3.left-column {
+	padding: 0;
+}
+
+.left-column form {
+	padding: 0 20px;
+}
+
+.left-column li {
+	list-style-type: none;
+	margin: 0; padding: 10px 15px;
+	border-bottom: 1px dotted #E7E7E7;
+	clear: both; overflow: hidden;
+}
+
+.left-column li:hover {
+	cursor: pointer;
+	background: rgba(78, 193, 247, 0.45) !important;
+}
+
+.left-column .row.collapse.relative {
+	margin: 0 -15px;
+	border-top: 1px solid #ddd;
+}
+
+.foundicon-search.absolute {
+	top: 8px; left: 8px;
+}
+
+.abs-right {
+	position: absolute;
+	top: 8px; right: 8px;
+}
+
+.input-search {
+	padding-left: 30px !important;
+}
+
+.button {
+	margin: 0;
+}
+
+/*================================================================= MAP =================================================================*/
+.toggle-map {
+	background: #2284a1; color: #fff;
+	display: inline-block; width: 40px; height: 40px; padding: 11px 0 0;
+	position: absolute; right: 15px; top: 15px;
+	font-size: 23px; text-align: center;
+	z-index: 4000;
+	border-radius: 100%;
+}
+
+.toggle-map:hover {
+	cursor: pointer;
+}
+
+/*================================================================= MOBILE =================================================================*/
+@media only screen and (max-width: 479px) {
+	.row-full .left-column {
+		height: 0; max-height: 250px;
+		overflow: hidden;
+		border-bottom: 1px solid #ddd;
+	}
+
+	.row-full .left-column .overscroll {
+		max-height: 185px;
+	}
+
+	.row-full .left-column.open {
+		height: 250px;
+	}
+
+	.large-9 { overflow: hidden; }
+	.map { min-height: 200px; width: 100%; }
+
+	.main-list {
+		max-height: 180px;
+	}
+}
+
+@media only screen and (min-width: 480px) and (max-width: 768px) {
+	.row-full .large-3 {
+		max-width: 40%;
+	}
+
+	.row-full .large-3 form, .row-full .large-3 form > .row, .row-full .large-12  {
+		height: 100%;
+	}
+
+	.row-full .left-column {
+		width: 0;
+		overflow: hidden;
+	}
+
+	.row-full .left-column.open {
+		width: 40%; min-height: 270px;
+	}
+
+	.map {
+		position: absolute; top: 0; right: 0; bottom: 0;
+		width: 100%; z-index: 3000;
+	}
+}
+
+@media only screen and (min-width: 769px) {
+	.iscroll-wrapper {
+		min-height: 750px !important;
+	}
+
+	.row-full .left-column form, .row-full .left-column .row.relative, .row-full .left-column .large-12 {
+		height: 100%;
+	}
+}
+
+/*================================================================= ISCROLL =================================================================*/
+body,ul,li {
+	padding:0;
+	margin:0;
+	border:0;
+}
+
+.iscroll-wrapper {
+	position:absolute; top: 0; bottom: 0; left: 0; right: 0;
+	height: 100%; width:100%;
+	min-height: 180px;
+	margin: 0;
+	z-index:1;
+	overflow:auto;
+}
+
+.iscroll-scroller {
+	position:absolute; z-index:1;
+	/*	-webkit-touch-callout:none;*/
+	-webkit-tap-highlight-color:rgba(0,0,0,0);
+	width:100%;
+	padding:0;
+}

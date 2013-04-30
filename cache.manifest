@@ -1,0 +1,13 @@
+﻿CACHE MANIFEST 
+CACHE:
+/js/socket.io.js
+/js/vendor/custom.modernizr.js
+/css.css
+/js.js
+http://rest.cloudapp.net/images/locate.png
+http://rest.cloudapp.net/images/locate_active.png
+http://rest.cloudapp.net/images/markers-shadow.png
+http://rest.cloudapp.net/images/markers-soft.png
+http://rest.cloudapp.net/font/fontawesome-webfont.ttf?v=3.0.1
+NETWORK: 
+*
