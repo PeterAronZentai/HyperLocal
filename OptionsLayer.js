@@ -96,7 +96,7 @@ $data.MapSearch = L.Control.extend({
         //this._update();
         var container = this._container = L.DomUtil.create('div', 'leaflet-bar leaflet-control-search ');
         //<a class="foundicon-search" href="#"></a>
-        $(container).append("<span class='foundicon-search'></span><input id='searchDisplay'>asdasd</input>");
+        $(container).append("<span class='foundicon-search'></span><span id='searchDisplay'>asdasd</span>");
         console.log(container);
         var options = this.options;
         $(container).on("click", function () {

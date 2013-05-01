@@ -19,7 +19,7 @@
 		//    .on('layerremove', this._onLayerChange, this);
         var container = this._container = L.DomUtil.create('div', 'leaflet-control-options');
         
-        $(container).html('v1.0beta');
+        $(container).html('v1.0b2');
         console.log(container);
         return container;
     },

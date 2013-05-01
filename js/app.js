@@ -22,7 +22,7 @@ function search(options) {
     if (options.app.lastSearch.version != options.version) {
         console.log("outdated search");
     }
-    $('#searchDisplay').val(options.q);
+    $('#searchDisplay').text(options.q);
 
     if (options.bounds) {
         var lb = options.bounds.getSouthWest();
@@ -898,8 +898,10 @@ $(function () {
     var bing = new L.BingLayer(bingKey, { maxZoom: 19 });
 
 
-    searchControl = new $data.MapSearch();
-    searchControl.addTo(lmap);
+    if (L.Browser.mobile) {
+        searchControl = new $data.MapSearch();
+        searchControl.addTo(lmap);
+    }
 
     trace = new $data.LeafletTrace();
     trace.addTo(lmap);
