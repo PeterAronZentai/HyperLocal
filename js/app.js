@@ -20,7 +20,6 @@ function search(options) {
     var query;
     trace.logLine("search: v" + options.version);
     if (options.app.lastSearch.version != options.version) {
-        console.log("outdated search");
     }
     $('#searchDisplay').text(options.q);
 
@@ -81,9 +80,7 @@ function search(options) {
                 return
             };
             //console.log(x);
-            console.log("result for: " + options.q);
             if ($('#searchInput').val() != options.q) {
-                console.log("@@@@", "query outdated");
                 return;
             }
             if (options.type !== "followup") {
@@ -274,18 +271,49 @@ var app = {
         });
         itemsToRemove.reverse();
         itemsToRemove.forEach(function (idx) {
-            //console.log("removing", idx);
             $.observable(app.items).remove(idx);
         });
     },
     removeAllPoints: function () {
         $.observable(app).setProperty("pointIndex", {});
         $.observable(app).setProperty("items", []);
-        visiblePins.clearLayers();
+        //visiblePins.clearLayers();
         //$.observable(app.items).remove(0, app.items.length);
     },
+    myPinsLayer : new L.LayerGroup(),
 
-    pointIndex: {},
+
+    pinLayers: {
+        mine: new L.LayerGroup(),
+        search: new L.MarkerClusterGroup(), //TODO
+        others: new L.LayerGroup()
+    },
+
+    pointIndex: {
+
+    },
+
+    addPoints: function (points, type) {
+        var newPoints = points.filter(function (p) {
+            return !app.pointIndex[p.record_id];
+        });
+        var layer = app.pinLayers[type];
+        var markers = newPoints.map(function (p) {
+            poindexIndex[p.record_id] = p;
+            p.type = type;
+            return pointApi.createMarkerFromPoint(p);
+        });
+
+    },
+
+    removePoints: function (points) {
+
+    },
+
+    removeInvisiblePoints: function () {
+
+    },
+
     query: "Rest",
     selectedItem: null,
     selectedPoint: null,
@@ -436,7 +464,7 @@ var pointApi = {
     getPointIcon : function getPointIcon(p) {
         return p.isNew ? pointApi.markerIcons['NewPoint'] : pointApi.markerIcons[p.record.type] || pointApi.markerIcons['Other'];
     },
-    createMarkerFromPoint: function createMarkerFromPoint(p) {
+    createMarkerFromPoint: function createMarkerFromPoint(p, layer) {
         var marker = L.marker([p.record.lat, p.record.lon], {
             draggable: true,
             icon: pointApi.getPointIcon(p)
@@ -482,9 +510,7 @@ var pointApi = {
         //});
         //marker.bindPopup(d[0]);
         marker.bindPopup($('#popupTemplate').render(p));
-        //$.observable(p).observe("record.name", function () {
-        //    marker.bindPopup($('#popupTemplate').render(p));
-        //});
+
         p.getMarker = function () { return marker };
 
 
@@ -500,7 +526,7 @@ var pointApi = {
                 result.data[0].response.body) {
                 var res = JSON.parse(result.data[0].response.body);
 
-                res = Array.isArray(res) ? res : JSON.parse(res.error.message);
+                res = Array.isArray(res) ? res : JSON.parse(res.error.message.value);
                 //return $.Deferred(function (newDefer) {
                 //    newDefer.reject({ status: "error", data: res });
                 //});
@@ -515,6 +541,7 @@ var pointApi = {
                         var idx = app.items.indexOf(self);
                         $.observable(app.items).remove(idx);
                         app.currentOptions.markerLayer.removeLayer(self.getMarker());
+                        app.myPinsLayer.removeLayer(self.getMarker());
                         sendMessage("delete", self);
                     }, translateServiceError);
         }
@@ -557,7 +584,6 @@ var pointApi = {
 }
 
 $.observable(app).observe("items", function () {
-    console.log("items changed!", arguments);
     //$([app.items]).bind("arrayChange", function (evt, o) {
     //    switch (o.change) {
     //        case "insert":
@@ -610,9 +636,7 @@ $.views.helpers({
     app: app
 })
 
-var visiblePins = new L.MarkerClusterGroup();
-//var visiblePins = new L.LayerGroup();
-var previousValue = '';
+var previousValue = 'Rest';
 
 //http://omniplaces.com/query_rewriter_m1?&lb_lng=19.004367656103568&lb_lat=47.502074825082246&rt_lng=19.139980143896537&rt_lat=47.52810322204093&q=star&limit=10&confirmed=false&callback=YUI.Env.JSONP.yui_3_4_0_4_1365747286608_6
 var lmap, bingKey;
@@ -653,7 +677,8 @@ function startService() {
                 $.observable(app.items).insert(0, p);
                 var marker = pointApi.createMarkerFromPoint(p);
                 marker.bindPopup("Unnamed point");
-                app.currentOptions.markerLayer.addLayer(marker);
+                //app.currentOptions.markerLayer.addLayer(marker);
+                app.myPinsLayer.addLayer(marker);
                 app.selectPoint(p);
                 app.closingOn = true;
                 app.currentOptions.markerLayer.zoomToShowLayer(marker, function () {
@@ -685,17 +710,14 @@ function startService() {
             });
             lmap.on('tap', function (e) {
                 //alert("!");
-                console.log("tap");
             });
             lmap.on('mouseup', function (e) {
                 //mapIsDragging = true;
                 //mapIsDragging -= 1;
-                console.log("mu");
             });
             lmap.on('mousedown', function (e) {
                 //mapIsDragging += 1;
                 //alert("!");
-                console.log("md");
             });
             lmap.on('touchstart', function (e) {
                 trace.logLine("touch start");
@@ -705,12 +727,12 @@ function startService() {
             });
             lmap.on('dragstart', function (e) {
                 trace.logLine("dragstart");
-                mapIsDragging = true;
+                //mapIsDragging = true;
                 cancellAll();
             });
             lmap.on('dragend', function (e) {
                 trace.logLine("dragend");
-                mapIsDragging = false;
+                //mapIsDragging = false;
                 if (lmap.getZoom() >= 15) {
                     doSearch("reposition", 500);
                 }
@@ -740,8 +762,9 @@ $(function () {
         $('#searchInput').blur();
         app.closingOn = true;
         marker.openPopup();
-        visiblePins.zoomToShowLayer($.view(this).data.getMarker(), function () {
+        app.currentOptions.markerLayer.zoomToShowLayer(marker, function () {
             app.closingOn = false;
+            lmap.panTo(marker.getLatLng());
             marker.openPopup();
         });
         //lmap.panTo(marker.getLatLng());
@@ -749,7 +772,7 @@ $(function () {
      .on("click", ".edit-command", function () {
          app.showEditor();
          var marker = $.view(this).data.getMarker();
-         visiblePins.zoomToShowLayer($.view(this).data.getMarker(), function () {
+         app.currentOptions.markerLayer.zoomToShowLayer($.view(this).data.getMarker(), function () {
              marker.openPopup();
              app.showEditor();
          });
@@ -758,7 +781,10 @@ $(function () {
          if (previousValue != this.value) {
              previousValue = this.value;
              var search = this.value;
-             if (search.length > 2) {
+             if (search.length > 2 || search == "") {
+                 if (search == "") {
+                     $('#searchInput').attr('placeholder', 'Browse all');
+                }
                  doSearch("new", 400);
              };
          }
@@ -785,10 +811,15 @@ $(function () {
      .on("click", ".cancel-command", function () {
          $('#addNewPoint').foundation('reveal', 'close');
          //console.log(
-         $.observable(app.items).remove(app.items.indexOf(app.selectedPoint));
-         app.currentOptions.markerLayer.removeLayer(app.selectedPoint.getMarker());
          hideRightPanel();
-         app.selectPoint(null);
+         window.setTimeout(function () {
+             $.observable(app.items).remove(app.items.indexOf(app.selectedPoint));
+             app.currentOptions.markerLayer.removeLayer(app.selectedPoint.getMarker());
+             app.myPinsLayer.removeLayer(app.selectedPoint.getMarker());
+             app.selectPoint(null);
+         }, 400);
+
+         return false;
      })
      .on("click", ".ok-command", function () {
          var self = this;
@@ -916,13 +947,11 @@ $(function () {
     editModeSwitch = new $data.EditMode({ app: app });
     editModeSwitch.addTo(lmap);
 
+    app.myPinsLayer.addTo(lmap);
 
-
-    app.pins = visiblePins;
     window.setTimeout(function () {
         lmap.addLayer(bing);
     }, 1000);
-    visiblePins.addTo(lmap);
     lmap.invalidateSize();
 
 

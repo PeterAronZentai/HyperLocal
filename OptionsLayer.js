@@ -14,7 +14,6 @@
         //this._update();
 
         var container = this._container = L.DomUtil.create('div', 'leaflet-bar leaflet-control-network');
-        console.log(container);
         return container;
     },
     setVisible: function (v) {
@@ -62,7 +61,6 @@ $data.EditMode = L.Control.extend({
         //this._update();
         var container = this._container = L.DomUtil.create('div', 'leaflet-bar leaflet-control-edit-switch ');
         $(container).append("<center><i href='#' class='foundicon-edit'></i></center>");
-        console.log(container);
         var options = this.options;
         $(container).on("click", function () {
             $(container).toggleClass("active");
@@ -96,11 +94,11 @@ $data.MapSearch = L.Control.extend({
         //this._update();
         var container = this._container = L.DomUtil.create('div', 'leaflet-bar leaflet-control-search ');
         //<a class="foundicon-search" href="#"></a>
-        $(container).append("<span class='foundicon-search'></span><span id='searchDisplay'>asdasd</span>");
-        console.log(container);
+        $(container).append("<span class='foundicon-search'></span><span id='searchDisplay'></span>");
         var options = this.options;
         $(container).on("click", function () {
             toggleMap();
+            $.observable(app).setProperty("items", app.currentOptions.points);
             return false;
         });
         return container;

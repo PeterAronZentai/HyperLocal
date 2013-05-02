@@ -13,9 +13,9 @@
 
     <title>HyperLocal</title>
     <script src="js/vendor/custom.modernizr.js"></script>
-    <link rel="stylesheet" href="css.css" />
+<!--    <link rel="stylesheet" href="css.css" />-->
 <!--    <link href="css/accessibility_foundicons.css" rel="stylesheet" />-->
-<!--    <link href="css/circle-menu.css" rel="stylesheet" />
+    <link href="css/circle-menu.css" rel="stylesheet" />
     <link rel="stylesheet" href="css/normalize.css" />
     <link rel="stylesheet" href="css/foundation.css" />
     <link rel="stylesheet" href="css/general_foundicons.css" />
@@ -25,12 +25,12 @@
 
     <link href="awesomefont/css/font-awesome.css" rel="stylesheet" />
 
-    <link href="leafletjs/leaflet.css" rel="stylesheet" />
+    <link href="leafletjs/master/leaflet.css" rel="stylesheet" />
     <link href="leafletjs/leaflet.awesome-markers.css" rel="stylesheet" />
     <link href="leafletjs/cluster.css" rel="stylesheet" />
     <link href="leafletjs/L.Control.Locate.css" rel="stylesheet" />
     <link href="js/toastr.css" rel="stylesheet" />
-    <link href="js/toastr-responsive.css" rel="stylesheet" />-->
+    <link href="js/toastr-responsive.css" rel="stylesheet" />
     <style>
         .leaflet-control-network {
             width:22px;
@@ -134,14 +134,6 @@
              background-color: whitesmoke
          }
     </style>
-    <script>
-        function mnuClick() {
-            alert("?");
-            window.event.cancelBubble = true;
-            window.event.returnValue = false;
-            return false;
-        }
-    </script>
 </head>
 <body>
 
@@ -389,16 +381,16 @@
             </fieldset>
             <div class="row">
                 {^{if save}}
-                <div class="large-6 columns">
+                <div class="small-6  large-6 columns">
                     <a href="#" class="button prefix save-command">Save</a>
                 </div>
                 {{/if}}
                 {^{if isNew}}
-                <div class="large-6 columns">
+                <div class="small-6  large-6 columns">
                   <a href="#" class="button prefix alert cancel-command">Cancel</a>
                 </div>
                 {{else}}
-                <div class="large-6 columns">
+                <div class="small-6 large-6 columns">
                   <a href="#" class="button prefix alert remove-command">Remove</a>
                 </div>
                 {{/if}}
@@ -409,7 +401,7 @@
     </script>
 
     <script src="js/socket.io.js"></script>
-<!--    <script src="js/vendor/jquery2b3.js"></script>
+    <script src="js/vendor/jquery2b3.js"></script>
     <script src="js/toastr.js"></script>
     <script src="js/vendor/jsrender.js"></script>
     <script src="js/vendor/jquery.observable.js"></script>
@@ -419,7 +411,7 @@
     <script src="js/foundation.min.js"></script>
     <script src="js/vendor/iscroll.js"></script>
 
-    <script src="leafletjs/latest/leaflet.js"></script>
+    <script src="leafletjs/master/leaflet.js"></script>
     <script src="leafletjs/leaflet.awesome-markers.js"></script>
     <script src="leafletjs/BingLayer.js"></script>
     <script src="leafletjs/latest/cluster.js"></script>
@@ -430,8 +422,8 @@
     <script src="js/hello.min.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/auth.js"></script>
-    <script src="js/app.js"></script>-->
-    <script src="js.js"></script>
+    <script src="js/app.js"></script>
+<!--    <script src="js.js"></script>-->
 
     <script>
         $(document).foundation().foundation('reveal', {
