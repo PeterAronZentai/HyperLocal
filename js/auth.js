@@ -1,13 +1,19 @@
 ﻿function initAuth() {
+    if (!hello) {
+        console.log("hello missing");
+        return;
+    }
     hello.init({
         facebook: '439026716191124',
         google: '449285537332-jkcc38anllj53up1frq2cjjockgpct5i.apps.googleusercontent.com'
     });
     hello.subscribe('auth.login', function (auth) {
         // call user information, for the given network
-        console.log("authlogin event", auth);
+        console.log("@@@@auth login event", auth);
         try {
             hello.api(auth.network + '/me', function (r) {
+                console.log("@@@@@hello user established", auth);
+
                 if (!r.id || !!document.getElementById(r.id)) {
                     hello.logout();
                     return;
@@ -15,6 +21,9 @@
                 //var target = document.getElementById("profile_"+ auth.network );
                 //target.innerHTML = '<img src="'+ r.picture +'" /> Hey '+r.name;
                 window.logedInUser = r;
+                if (window.authDeferred) {
+                    window.authDeferred.resolve(window.logedInUser);
+                }
                 sendMessage("info", r.name + " logged in");
                 console.log(r);
             });
@@ -58,9 +67,11 @@ function logedIn() {
     return gLogin || fLogin;
 }
 function doLogin(network) {
+    console.log("@@@@@doing hello login");
     hello.login(network, function (auth) {
+        console.log("@@@@@hello login done");
         if (auth.authResponse && window.authDeferred) {
-            window.authDeferred.resolve(window.logedInUser);
+            //window.authDeferred.resolve(window.logedInUser);
         } else {
             if (window.authDeferred) {
                 window.authDeferred.reject();

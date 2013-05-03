@@ -100,6 +100,7 @@ L.Control.Locate = L.Control.extend({
 
             self._event = e;
 
+
             if (!self._active) {
                 return;
             }
@@ -144,6 +145,8 @@ L.Control.Locate = L.Control.extend({
             L.circleMarker(self._event.latlng, self.options.markerStyle)
                 .bindPopup(t[0] + distance + " " + unit  + t[1])
                 .addTo(self._layer);
+
+            doSearch("reposition", 500);
 
             if (!self._container)
                 return;

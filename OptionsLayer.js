@@ -97,8 +97,7 @@ $data.MapSearch = L.Control.extend({
         $(container).append("<span class='foundicon-search'></span><span id='searchDisplay'></span>");
         var options = this.options;
         $(container).on("click", function () {
-            toggleMap();
-            $.observable(app).setProperty("items", app.currentOptions.points);
+            app.toggleMap();
             return false;
         });
         return container;

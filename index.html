@@ -13,9 +13,9 @@
 
     <title>HyperLocal</title>
     <script src="js/vendor/custom.modernizr.js"></script>
-<!--    <link rel="stylesheet" href="css.css" />-->
+    <link rel="stylesheet" href="css.css" />
 <!--    <link href="css/accessibility_foundicons.css" rel="stylesheet" />-->
-    <link href="css/circle-menu.css" rel="stylesheet" />
+<!--    <link href="css/circle-menu.css" rel="stylesheet" />
     <link rel="stylesheet" href="css/normalize.css" />
     <link rel="stylesheet" href="css/foundation.css" />
     <link rel="stylesheet" href="css/general_foundicons.css" />
@@ -30,7 +30,7 @@
     <link href="leafletjs/cluster.css" rel="stylesheet" />
     <link href="leafletjs/L.Control.Locate.css" rel="stylesheet" />
     <link href="js/toastr.css" rel="stylesheet" />
-    <link href="js/toastr-responsive.css" rel="stylesheet" />
+    <link href="js/toastr-responsive.css" rel="stylesheet" />-->
     <style>
         .leaflet-control-network {
             width:22px;
@@ -280,9 +280,9 @@
             <input type="text" readonly placeholder="Name of place"  value="resolving address from coordinates"/>
         {{/if}}
     </script>
-
+    <!---link="xcss-background-color{:~bgColor(~app.selectedPoint)}-->
     <script type="text/x-jsrender" id="poiTemplate">
-        <li data-link="css-background-color{:~bgColor(~app.selectedPoint)}" >
+        <li>
             {^{> record.name}} 
             {^{if ~app.selectedPoint === #data}}
                 {^{if ~app.editorVisible}}
@@ -401,7 +401,7 @@
     </script>
 
     <script src="js/socket.io.js"></script>
-    <script src="js/vendor/jquery2b3.js"></script>
+<!--    <script src="js/vendor/jquery2b3.js"></script>
     <script src="js/toastr.js"></script>
     <script src="js/vendor/jsrender.js"></script>
     <script src="js/vendor/jquery.observable.js"></script>
@@ -422,8 +422,8 @@
     <script src="js/hello.min.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/auth.js"></script>
-    <script src="js/app.js"></script>
-<!--    <script src="js.js"></script>-->
+    <script src="js/app.js"></script>-->
+    <script src="js.js"></script>
 
     <script>
         $(document).foundation().foundation('reveal', {

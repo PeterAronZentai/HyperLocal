@@ -55,20 +55,6 @@ function search(options) {
 
     ////var visibleLayers = [];
     //var activeSearches = [];
-    function wireDownOptions(options) {
-        lmap.removeLayer(options.markerLayer);
-    }
-
-    function wireUpOptions(options) {
-        options.markerLayer = new L.MarkerClusterGroup({ showCoverageOnHover: false });
-        options.points = []
-        options.pointIndex = {};
-        if (options.type === 'new' || (!L.Browser.mobile)) {
-            $.observable(app).setProperty("items", options.points);
-        }
-        return options;
-    }
-
 
     if (options.app) {
         var app = options.app;
@@ -83,41 +69,37 @@ function search(options) {
             if ($('#searchInput').val() != options.q) {
                 return;
             }
-            if (options.type !== "followup") {
-                if (app.currentOptions) {
-                    wireDownOptions(app.currentOptions);
-                }
-                app.currentOptions = wireUpOptions(options);
+            if (options.type === "new") {
+                app.removeAll();
             } else {
-                //app.removeAllPoints();
-                //app.removeInvisiblePoints();
+                app.removeInvisiblePoints();
             }
-
-            var markers = [];
-            x.results.forEach(function (p) {
-                markers.push(pointApi.createMarkerFromPoint(p));
-            });
+            app.addPoints(x.results, 'search');
+            //var markers = [];
+            //x.results.forEach(function (p) {
+            //    markers.push(pointApi.createMarkerFromPoint(p));
+            //});
             
-            $.observable(options.points).insert(options.points.length, x.results);
+            //$.observable(options.points).insert(options.points.length, x.results);
 
-            if (L.Browser.mobile) {
-                function addByChunk() {
-                    options.markerLayer.addLayers(markers);
-                    //var subset = markers.splice(0, 50);
-                    //if (!mapIsDragging) {
-                    //    options.markerLayer.addLayers(subset);
-                    //}
-                    //if (markers.length > 0) {
-                    //    window.webkitRequestAnimationFrame(addByChunk);
-                    //}
-                    trace.logLine("markers there  v" + options.version);
-                    options.markerLayer.addTo(lmap);
-                }
-                window.webkitRequestAnimationFrame(addByChunk);
-            } else {
-                options.markerLayer.addLayers(markers);
-                options.markerLayer.addTo(lmap);
-            }
+            //if (L.Browser.mobile) {
+            //    function addByChunk() {
+            //        options.markerLayer.addLayers(markers);
+            //        //var subset = markers.splice(0, 50);
+            //        //if (!mapIsDragging) {
+            //        //    options.markerLayer.addLayers(subset);
+            //        //}
+            //        //if (markers.length > 0) {
+            //        //    window.webkitRequestAnimationFrame(addByChunk);
+            //        //}
+            //        trace.logLine("markers there  v" + options.version);
+            //        options.markerLayer.addTo(lmap);
+            //    }
+            //    window.webkitRequestAnimationFrame(addByChunk);
+            //} else {
+            //    options.markerLayer.addLayers(markers);
+            //    options.markerLayer.addTo(lmap);
+            //}
 
             //if (L.Browser.mobile) {
             //    function pushTen() {
@@ -136,7 +118,7 @@ function search(options) {
             //    $.observable(app.items).insert(app.items.length, newPoints);
             //}
             $.observable(app).setProperty("totalCount", x.results_found);
-            $.observable(app).setProperty("visibleCount", app.items.length);
+            $.observable(app).setProperty("visibleCount", Object.keys(app.pointIndex).length);
             //console.log(x.limit, x.results_found);
             if (!L.Browser.mobile && options.type !== "followup" && (options.app.items.length < x.results_found)) {
                 var newOpts = $.extend({}, options);
@@ -193,13 +175,14 @@ function dispatchMsg(data) {
             break;
         case "update":
             var toast = toastr.info(data.senderName + " updated " + data.msg.record.name, "Updated");
-            var p = data.msg;
-            if (app.pointIndex[p.record.id]) {
-                var pt = app.pointIndex[p.record.id];
-                var idx = app.items.indexOf(pt);
-                $.observable(app.items).remove(idx);
-                $.observable(app.items).insert(idx, p);
-            }
+            //app.addPoints([p], "others");
+            ////var p = data.msg;
+            ////if (app.pointIndex[p.record.id]) {
+            ////    var pt = app.pointIndex[p.record.id];
+            ////    var idx = app.items.indexOf(pt);
+            ////    $.observable(app.items).remove(idx);
+            ////    $.observable(app.items).insert(idx, p);
+            ////}
             toast.on("click", function () {
                 lmap.panTo([p.record.lat, p.record.lon]);
             });
@@ -207,12 +190,14 @@ function dispatchMsg(data) {
         case "move":
             var toast = toastr.info(data.senderName + " moved " + data.msg.record.name, "Moved");
             var p = data.msg;
-            if (app.pointIndex[p.record.id]) {
-                var pt = app.pointIndex[p.record.id];
-                var idx = app.items.indexOf(pt);
-                $.observable(app.items).remove(idx);
-                $.observable(app.items).insert(idx, p);
-            }
+            app.removePoints([p], "others");
+            app.addPoints([p], "others");
+            //if (app.pointIndex[p.record.id]) {
+            //    var pt = app.pointIndex[p.record.id];
+            //    var idx = app.items.indexOf(pt);
+            //    $.observable(app.items).remove(idx);
+            //    $.observable(app.items).insert(idx, p);
+            //}
             toast.on("click", function () {
                 lmap.panTo([p.record.lat, p.record.lon]);
             });
@@ -220,23 +205,17 @@ function dispatchMsg(data) {
         case "new":
             var toast = toastr.info(data.senderName + " created " + data.msg.record.name, "Created");
             var p = data.msg;
-            //if (!app.pointIndex[p.record.id]) {
-                $.observable(app.items).insert(app.items.length, p);
-                app.currentOptions.markerLayer.addLayer(pointApi.createMarkerFromPoint(p));
-            //}
+            app.addPoints([p], "others");
             toast.on("click", function () {
-                app.currentOptions.markerLayer.zoomToShowLayer(p.getMarker());
+                lmap.panTo(p.getMarker().getLatLng());
+                //app.currentOptions.markerLayer.zoomToShowLayer(p.getMarker());
                 //lmap.panTo([p.record.lat, p.record.lon]);
             });
             break;
         case "delete":
             var toast = toastr.info(data.senderName + " deleted " + data.msg.record.name, "Deleted");
             var p = data.msg;
-            if (app.pointIndex[p.record.id]) {
-                var pt = app.pointIndex[p.record.id];
-                var idx = app.items.indexOf(pt);
-                $.observable(app.items).remove(idx);
-            }
+            app.removePoints([p]);
             toast.on("click", function () {
                 lmap.panTo([p.record.lat, p.record.lon]);
             });
@@ -258,25 +237,44 @@ function sendMessage(msgType, msg) {
 var app = {
     pins: null,
     editMode: false,
+    searchVisible:  !L.Browser.mobile,
+    toggleMap: function () {
+        $.observable(app).setProperty("searchVisible", !(app.searchVisible));
+        if (app.searchVisible) {
+            $.observable(app.items).remove(0, app.items.length);
+            var pts = [];
+            Object.keys(app.pointIndex).forEach(function (key) {
+                pts.push(app.pointIndex[key]);
+            });
+            $.observable(app.items).insert(0, pts);
+        }
+        toggleMap();
+        //var items = [];
+        //Object.keys(app.pointIndex).forEach(function (key) {
+        //    items.push(app.pointIndex[key]);
+        //});
+        //$.observable(app).setProperty("visibleCount", items.length);
+        //$.observable(app).setProperty("items", items);
+    },
     toggleEditMode: function() {
         $.observable(app).setProperty("editMode", !app.editMode);
     },
     removeInvisiblePoints: function () {
-        var bounds = lmap.getBounds();
-        var itemsToRemove = [];
-        app.items.forEach(function (item, idx) {
-            if (!bounds.contains([item.record.lat, item.record.lon])) {
-                itemsToRemove.push(idx);
+        var b = lmap.getBounds();
+        var pointsToRemove = [];
+        for (k in app.pointIndex) {
+            var p = app.pointIndex[k];
+            if (! b.contains(p.getMarker().getLatLng())) {
+                pointsToRemove.push(p);
             }
-        });
-        itemsToRemove.reverse();
-        itemsToRemove.forEach(function (idx) {
-            $.observable(app.items).remove(idx);
-        });
+        }
+        
+        app.removePoints(pointsToRemove);
     },
-    removeAllPoints: function () {
+    removeAll: function () {
         $.observable(app).setProperty("pointIndex", {});
         $.observable(app).setProperty("items", []);
+        app.pinLayers["search"].clearLayers();
         //visiblePins.clearLayers();
         //$.observable(app.items).remove(0, app.items.length);
     },
@@ -285,7 +283,7 @@ var app = {
 
     pinLayers: {
         mine: new L.LayerGroup(),
-        search: new L.MarkerClusterGroup(), //TODO
+        search: new L.MarkerClusterGroup({ showCoverageOnHover: false }), //TODO
         others: new L.LayerGroup()
     },
 
@@ -299,30 +297,89 @@ var app = {
         });
         var layer = app.pinLayers[type];
         var markers = newPoints.map(function (p) {
-            poindexIndex[p.record_id] = p;
+            app.pointIndex[p.record_id] = p;
             p.type = type;
             return pointApi.createMarkerFromPoint(p);
         });
+        if (layer instanceof L.MarkerClusterGroup) {
+            layer.addLayers(markers);
+        } else {
+            markers.forEach(function (marker) {
+                layer.addLayer(marker);
+            });
+        }
+        var idxToInsert = (type === "mine" ? 0 : app.items.length);
 
+        ///TODO
+        if (app.searchVisible) {
+            $.observable(app.items).insert(idxToInsert, newPoints);
+        }
     },
 
     removePoints: function (points) {
+        var others = [];
+        var search = [];
+        var mine = [];
+        
+        var pts = [];
+        points.forEach(function (p) {
+            var p = app.pointIndex[p.record_id];
+            if (!p) { return };
+            if (p.type === 'search') {
+                search.push(p.getMarker());
+                p.getMarker = null;
+            } else if (p.type === 'others') {
+                others.push(p.getMarker());
+                p.getMarker = null;
+            } else if (p.type === 'mine') {
+                mine.push(p.getMarker());
+                p.getMarker = null;
+            }
+            delete app.pointIndex[p.record_id];
+            pts.push(p);
+        });
+        console.log("removing:" + search.length);
+        app.pinLayers['search'].removeLayers(search);
+        others.forEach(function (m) {
+            app.pinLayers['others'].removeLayer(m);
+        });
+        mine.forEach(function (m) {
+            app.pinLayers['mine'].removeLayer(m);
 
+        });
+        if (app.searchVisible) {
+            pts.forEach(function (p) {
+                $.observable(app.items).remove(app.items.indexOf(p), 1);
+            });
+        }
+
+        //if (pts.length > 1) {
+           
+        //} else {
+        //}
     },
 
-    removeInvisiblePoints: function () {
 
-    },
 
     query: "Rest",
     selectedItem: null,
     selectedPoint: null,
     newAddress: null,
     selectPoint: function (selectedPoint) {
+        app.closingOn = true;
         if (selectedPoint !== app.selectedPoint) {
             $.observable(app).setProperty("selectedPoint", selectedPoint);
+            if (selectedPoint) {
+                var marker = selectedPoint.getMarker();
+                if (selectedPoint.type === "search") {
+                    app.pinLayers['search'].zoomToShowLayer(marker, function () {
+                        marker.openPopup();
+                        app.closingOn = false;
+                    });
+                }
+            }
         } else if (selectedPoint) {
-            app.showEditor();
+            //app.showEditor();
         }
 
     },
@@ -408,11 +465,20 @@ var app = {
     remove: function () {
         ensureAuthenticate()
             .then(function (n) {
-                //if (!window.logedInUser) {
-                //    alert("User lost. Click again to reclaim");
-                //    hello.logout();
-                //    return;
-                //};
+                if (!window.logedInUser) {
+                    window.setTimeout(function () {
+                        app.selectedPoint
+                            .remove()
+                            .then(function (opResult) {
+                                app.hideEditor();
+                            })
+                            .fail(function (opResult) {
+                                $.observable(app).setProperty("error", opResult);
+                                app.showError();
+                                console.dir(opResult)
+                            });
+                    }, 1500);
+                };
                 app.selectedPoint
                     .remove()
                     .then(function (opResult) {
@@ -423,6 +489,7 @@ var app = {
                         app.showError();
                         console.dir(opResult)
                     });
+                
             })
             .fail(function () {
                 //alert('error')
@@ -464,16 +531,19 @@ var pointApi = {
     getPointIcon : function getPointIcon(p) {
         return p.isNew ? pointApi.markerIcons['NewPoint'] : pointApi.markerIcons[p.record.type] || pointApi.markerIcons['Other'];
     },
+
+    marker_click: function(e) {
+
+    },
     createMarkerFromPoint: function createMarkerFromPoint(p, layer) {
         var marker = L.marker([p.record.lat, p.record.lon], {
             draggable: true,
             icon: pointApi.getPointIcon(p)
         });
 
-        marker.on('touchstart', function(e) {
-            console.dir("touch");
-        })
-              .on('click', function (e) {
+        marker.on('click', function (e) {
+            console.dir(e);
+            alert('!');
                   app.selectPoint(p);
               })
               .on('dragstart', function (e) {
@@ -515,6 +585,9 @@ var pointApi = {
 
 
         function getUser() {
+            if (!window.logedInUser) {
+                return { id : 0, name: 'System user' }
+            }
             return { id: window.logedInUser.id, name: window.logedInUser.name } 
         }
 
@@ -538,10 +611,7 @@ var pointApi = {
             return service
                     .delete({ record: { id: self.record.id }, user: getUser() })
                     .then(function () {
-                        var idx = app.items.indexOf(self);
-                        $.observable(app.items).remove(idx);
-                        app.currentOptions.markerLayer.removeLayer(self.getMarker());
-                        app.myPinsLayer.removeLayer(self.getMarker());
+                        app.removePoints([self]);
                         sendMessage("delete", self);
                     }, translateServiceError);
         }
@@ -583,47 +653,10 @@ var pointApi = {
 
 }
 
-$.observable(app).observe("items", function () {
-    //$([app.items]).bind("arrayChange", function (evt, o) {
-    //    switch (o.change) {
-    //        case "insert":
-    //            //var markers = [];
-    //            //o.items.forEach(function (p) {
-    //            //    //if (!app.pointIndex[p.record_id]) {
-    //            //    app.pointIndex[p.record.id] = p;
-    //            //    markers.push(pointApi.createMarkerFromPoint(p));
-    //            //    //}
-    //            //});
-    //            ////opt1
-    //            //visiblePins.addLayers(markers);
-    //            ////opt1
-    //            //$.observable(app).setProperty("visibleCount", app.items.length);
-    //            break;
-    //        case "remove":
-    //            var markers = [];
-    //            //o.items.forEach(function (item) {
-    //            //    delete app.pointIndex[item.record.id];
-    //            //    markers.push(item.getMarker());
-    //            //    //if (item.removeFromMap) {
-    //            //    //    item.removeFromMap();
-    //            //    //} else {
-    //            //    //    console.dir("!!!");
-    //            //    //}
-    //            //    if (item === app.selectedPoint) {
-    //            //        app.selectPoint(null);
-    //            //        app.hideEditor();
-    //            //    }
-    //            //});
-    //            //visiblePins.removeLayers(markers);
-    //            //$.observable(app).setProperty("visibleCount", app.items.length);
-    //            break;
-    //        default:
-    //            alert("!");
-    //            throw "unknown";
-    //    };
-    //});
-
-});
+//$.observable(app).observe("items", function () {
+//    $([app.items]).bind("arrayChange", function (evt, o) {
+//    });
+//});
 
 var mapIsDragging = 0;
 
@@ -671,21 +704,20 @@ function startService() {
 
                 var p = {
                     isNew: true,
+                    record_id: r.id,
                     record: r
                 };
 
-                $.observable(app.items).insert(0, p);
-                var marker = pointApi.createMarkerFromPoint(p);
-                marker.bindPopup("Unnamed point");
-                //app.currentOptions.markerLayer.addLayer(marker);
-                app.myPinsLayer.addLayer(marker);
+                //$.observable(app.items).insert(0, p);
+                //var marker = pointApi.createMarkerFromPoint(p);
+                app.addPoints([p], 'mine');
                 app.selectPoint(p);
                 app.closingOn = true;
-                app.currentOptions.markerLayer.zoomToShowLayer(marker, function () {
-                    app.closingOn = false;
-                    marker.openPopup();
-                    app.showEditor();
-                });
+                //app.currentOptions.markerLayer.zoomToShowLayer(marker, function () {
+                //    app.closingOn = false;
+                //    marker.openPopup();
+                app.showEditor();
+                //});
                 $.observable(app).setProperty("newAddress", null);
                 //hideRightPanel();
                 //$('#addNewPoint').foundation('reveal', 'open');
@@ -757,16 +789,14 @@ $(function () {
     $.link.mainTemplate('#row-full', app)
     .on("click", ".main-list > li", function () {
         var selectedItem = $.view(this);
-        app.selectItem(selectedItem);
-        var marker = $.view(this).data.getMarker();
-        $('#searchInput').blur();
         app.closingOn = true;
-        marker.openPopup();
-        app.currentOptions.markerLayer.zoomToShowLayer(marker, function () {
-            app.closingOn = false;
-            lmap.panTo(marker.getLatLng());
-            marker.openPopup();
-        });
+        app.selectItem(selectedItem);
+        $('#searchInput').blur();
+        //app.currentOptions.markerLayer.zoomToShowLayer(marker, function () {
+        //    app.closingOn = false;
+        //    lmap.panTo(marker.getLatLng());
+        //    marker.openPopup();
+        //});
         //lmap.panTo(marker.getLatLng());
     })
      .on("click", ".edit-command", function () {
@@ -801,9 +831,6 @@ $(function () {
      })
     .on("click", ".remove-command", function () {
         app.remove();
-        //ensureAuthenticate().then(function () {
-        //    alert("!");
-        //});
     })
      .on("click", ".cancel-error-command", function () {
          app.hideError();
@@ -813,10 +840,11 @@ $(function () {
          //console.log(
          hideRightPanel();
          window.setTimeout(function () {
-             $.observable(app.items).remove(app.items.indexOf(app.selectedPoint));
-             app.currentOptions.markerLayer.removeLayer(app.selectedPoint.getMarker());
-             app.myPinsLayer.removeLayer(app.selectedPoint.getMarker());
-             app.selectPoint(null);
+             app.removePoints([app.selectedPoint]);
+             //$.observable(app.items).remove(app.items.indexOf(app.selectedPoint));
+             //app.currentOptions.markerLayer.removeLayer(app.selectedPoint.getMarker());
+             //app.myPinsLayer.removeLayer(app.selectedPoint.getMarker());
+             //app.selectPoint(null);
          }, 400);
 
          return false;
@@ -875,8 +903,7 @@ $(function () {
     });
 
     $('#menu-search').click(function (evt) {
-        toggleMap();
-        $.observable(app).setProperty("items", app.currentOptions.points);
+        app.toggleMap();
         evt.stopPropagation();
     });
 
@@ -947,8 +974,9 @@ $(function () {
     editModeSwitch = new $data.EditMode({ app: app });
     editModeSwitch.addTo(lmap);
 
-    app.myPinsLayer.addTo(lmap);
-
+    for (var k in app.pinLayers) {
+        app.pinLayers[k].addTo(lmap);
+    }
     window.setTimeout(function () {
         lmap.addLayer(bing);
     }, 1000);
