@@ -1,0 +1,152 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <script src="http://code.jquery.com/jquery.js"></script>
+<link rel="stylesheet" href="css/foundation.css" />
+    <script src="js/foundation.min.js"></script>
+    <style>
+        #container {
+            position:absolute;
+            width: 250px;
+            top: 10px;
+            left: 10px;
+            -webkit-overflow-scrolling: touch;
+            -webkit-transform: translateX(0);
+            -webkit-transition: -webkit-transform 0.5s;
+        }
+        .hidden {
+            -webkit-transform: translateX(100%);
+        }
+    </style>
+    <script>
+        $(function () {
+            container.style.height = '300px';
+        });
+    </script>
+</head>
+<body>
+    <div id="container" style="overflow-y:scroll">
+        <form>
+            <fieldset>
+              <legend>Title</legend>
+              <div class="row">
+                <div class="large-12 columns">
+                  <input type="text" class="input-edit" placeholder="Name your point" data-link="record.name">
+                </div>
+              </div>
+            </fieldset>
+            <fieldset>
+                <legend>Taxonomy</legend>
+                <div class="row">
+                  <div class="large-6 columns">
+                    <label>Category</label>
+                    <input type="text" data-link="record.cat" placeholder="Category">
+                  </div>
+                  <div class="large-6 columns">
+                    <label>SubCat</label>
+                    <input type="text" data-link="record.subcat" placeholder="Subcategory">
+                  </div>
+                </div>
+                  <div class="row">
+                  <div class="large-12 columns">
+                    <label>Type</label>
+                    <input type="text" data-link="record.type" placeholder="Type">
+                  </div>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Address</legend>
+                <div class="row">
+                  <div class="large-6 columns">
+                    <label>Address</label>
+                    <input type="text" data-link="record.addr" placeholder="Street address">
+                  </div>
+                  <div class="large-6 columns">
+                    <label>Phone</label>
+                    <input type="text" data-link="record.phone" placeholder="large-4.columns">
+                  </div>
+                </div>
+                <div class="row">
+                   <div class="large-4 columns">
+                    <label>ZIP/Postal</label>
+                    <input type="text" data-link="record.postal" placeholder="large-4.columns">
+                  </div>
+                   <div class="large-4 columns">
+                    <label>City</label>
+                    <input type="text" data-link="record.city" placeholder="large-4.columns">
+                  </div>
+                   <div class="large-4 columns">
+                    <label>Country</label>
+                    <input type="text" data-link="record.country" placeholder="large-4.columns">
+                  </div>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Location</legend>
+            <div class="row">
+                  <div class="small-6 columns">
+                      <label>Latitude</label>
+                    <input type="text" data-link="record.lat" placeholder="small-9.columns">
+                  </div>
+                  <div class="small-6 columns">
+                      <label>Longitude</label>
+                    <input type="text" data-link="record.lon" placeholder="small-9.columns">
+                  </div>
+            </div>
+            </fieldset>
+            <div class="row">
+                {^{if save}}
+                <div class="small-6  large-6 columns">
+                    <a href="#" class="button prefix save-command">Save</a>
+                </div>
+                {{/if}}
+                {^{if isNew}}
+                <div class="small-6  large-6 columns">
+                  <a href="#" class="button prefix alert cancel-command">Cancel</a>
+                </div>
+                {{else}}
+                <div class="small-6 large-6 columns">
+                  <a href="#" class="button prefix alert remove-command">Remove</a>
+                </div>
+                {{/if}}
+            </div>
+        </form>
+    </div>
+    <button onclick="$('#container').addClass('hidden')">AAA</button>
+    <script>
+        $(document).foundation().foundation('reveal', {
+            closeOnBackgroundClick: false,
+            animation: 'fadeAndPop',
+            animationSpeed: 0,
+            css: {
+                open: {
+                    'opacity': 1,
+                    'visibility': 'visible',
+                    'display': 'block'
+                },
+                close: {
+                    'opacity': 0,
+                    'visibility': 'hidden',
+                    'display': 'none'
+                }
+            }
+        });
+
+        var iOS = (navigator.userAgent.toLowerCase().match(/(ipad|iphone|ipod)/g) ? true : false),
+            android = (navigator.userAgent.toLowerCase().match(/(android)/g) ? true : false);
+
+        if (iOS) {
+            $("body").addClass("ios");
+        }
+        if (android) {
+            $("body").addClass("android");
+        }
+    </script>
+</body>
+</html>
