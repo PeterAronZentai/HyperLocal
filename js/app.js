@@ -168,6 +168,7 @@ var socket = {
 
 
 function dispatchMsg(data) {
+    //handle socket io messages ad show toasts
     if (data.sender == me) return;
     switch (data.msgType) {
         case "info":
@@ -175,14 +176,8 @@ function dispatchMsg(data) {
             break;
         case "update":
             var toast = toastr.info(data.senderName + " updated " + data.msg.record.name, "Updated");
-            //app.addPoints([p], "others");
-            ////var p = data.msg;
-            ////if (app.pointIndex[p.record.id]) {
-            ////    var pt = app.pointIndex[p.record.id];
-            ////    var idx = app.items.indexOf(pt);
-            ////    $.observable(app.items).remove(idx);
-            ////    $.observable(app.items).insert(idx, p);
-            ////}
+            app.removePoints([p]);
+            app.addPoints([p], "others");
             toast.on("click", function () {
                 lmap.panTo([p.record.lat, p.record.lon]);
             });
@@ -190,14 +185,8 @@ function dispatchMsg(data) {
         case "move":
             var toast = toastr.info(data.senderName + " moved " + data.msg.record.name, "Moved");
             var p = data.msg;
-            app.removePoints([p], "others");
+            app.removePoints([p]);
             app.addPoints([p], "others");
-            //if (app.pointIndex[p.record.id]) {
-            //    var pt = app.pointIndex[p.record.id];
-            //    var idx = app.items.indexOf(pt);
-            //    $.observable(app.items).remove(idx);
-            //    $.observable(app.items).insert(idx, p);
-            //}
             toast.on("click", function () {
                 lmap.panTo([p.record.lat, p.record.lon]);
             });
@@ -237,7 +226,7 @@ function sendMessage(msgType, msg) {
 var app = {
     pins: null,
     editMode: false,
-    searchVisible:  !L.Browser.mobile,
+    searchVisible:  window.innerWidth > 400,
     toggleMap: function () {
         $.observable(app).setProperty("searchVisible", !(app.searchVisible));
         if (app.searchVisible) {
@@ -541,9 +530,10 @@ var pointApi = {
             icon: pointApi.getPointIcon(p)
         });
 
+        marker.getPoint = function() { return p }
+
         marker.on('click', function (e) {
             console.dir(e);
-            alert('!');
                   app.selectPoint(p);
               })
               .on('dragstart', function (e) {

@@ -4582,7 +4582,9 @@ body {
 	-webkit-user-select:none;
 	-webkit-text-size-adjust:none;
 }
-
+a {
+    	-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
 .row-full { max-width: 100%; }
 .row-full .large-3 { height: 100%; }
 .map { height: 500px; }
@@ -4632,7 +4634,11 @@ body.ios .left-column .overscroll 		{  }
 body.android .left-column .overscroll 	{  }
 
 body.ios .right-panel.overscroll 		{  }
-body.android .right-panel.overscroll 	{ -webkit-overflow-scrolling: touch; }
+body.android .right-panel.overscroll 	{ 
+    /*overflow-y:auto;*/
+    -webkit-overflow-scrolling:touch;
+
+}
 
 body.android .menu li:before, body.android .menu li a:before {
 	position: relative;
