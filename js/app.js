@@ -226,7 +226,7 @@ function sendMessage(msgType, msg) {
 var app = {
     pins: null,
     editMode: false,
-    searchVisible:  window.innerWidth > 400,
+    searchVisible:  window.innerWidth > 480,
     toggleMap: function () {
         $.observable(app).setProperty("searchVisible", !(app.searchVisible));
         if (app.searchVisible) {
