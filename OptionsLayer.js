@@ -60,7 +60,7 @@ $data.EditMode = L.Control.extend({
         //this._initLayout();
         //this._update();
         var container = this._container = L.DomUtil.create('div', 'leaflet-bar leaflet-control-edit-switch ');
-        $(container).append("<center><i href='#' class='foundicon-edit'></i></center>");
+        $(container).append("<center><i href='#' class='foundicon-location'></i></center>");
         var options = this.options;
         $(container).on("click", function () {
             $(container).toggleClass("active");
