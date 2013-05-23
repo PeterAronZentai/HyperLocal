@@ -302,7 +302,7 @@
 
     <script type="text/x-jsrender" id="popupTemplate">
         <div class="popup-container">
-            <div class="popup-bubble"><a href="javascript:app.showEditor()">{{> record.name}}</a></div>
+            <div class="popup-bubble"><a href="javascript:app.showEditor()">{{> record.name || 'New point'}}</a></div>
         </div>
     </script>
 

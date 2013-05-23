@@ -941,7 +941,7 @@ $(function () {
         zoomControl: !(L.Browser.mobile),
         zoom: 15
     });
-
+    lmap.attributionControl.setPrefix('');
     lmap.attributionControl.addAttribution("JayStack.com ©");
     var bing = new L.BingLayer(bingKey, { maxZoom: 19 });
 
