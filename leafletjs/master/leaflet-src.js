@@ -55,8 +55,9 @@ L.Util = {
 	},
 
 	stamp: (function () {
-		var lastId = 0, key = '_leaflet_id';
-		return function (/*Object*/ obj) {
+		var lastId = 0,
+		    key = '_leaflet_id';
+		return function (obj) {
 			obj[key] = obj[key] || ++lastId;
 			return obj[key];
 		};
@@ -396,7 +397,7 @@ L.Mixin.Events = {
 
 		var events = this[eventsKey],
 		    contextId = context && L.stamp(context),
-		    i, len, type, listeners, j, indexKey, indexLenKey, typeIndex;
+		    i, len, type, listeners, j, indexKey, indexLenKey, typeIndex, removed;
 
 		types = L.Util.splitWords(types);
 
@@ -418,7 +419,10 @@ L.Mixin.Events = {
 				if (listeners) {
 					for (j = listeners.length - 1; j >= 0; j--) {
 						if ((listeners[j].action === fn) && (!context || (listeners[j].context === context))) {
-							listeners.splice(j, 1);
+							removed = listeners.splice(j, 1);
+							// set the old action to a no-op, because it is possible
+							// that the listener is being iterated over as part of a dispatch
+							removed[0].action = L.Util.falseFn;
 						}
 					}
 
@@ -461,7 +465,7 @@ L.Mixin.Events = {
 		typeIndex = events[type + '_idx'];
 
 		for (contextId in typeIndex) {
-			listeners = typeIndex[contextId];
+			listeners = typeIndex[contextId].slice();
 
 			if (listeners) {
 				for (i = 0, len = listeners.length; i < len; i++) {
@@ -896,6 +900,19 @@ L.DomUtil = {
 				left += docBody.scrollLeft || docEl.scrollLeft || 0;
 				break;
 			}
+
+			if (pos === 'relative' && !el.offsetLeft) {
+				var width = L.DomUtil.getStyle(el, 'width'),
+				    maxWidth = L.DomUtil.getStyle(el, 'max-width');
+
+				if (width !== 'none' || maxWidth !== 'none') {
+					var r = el.getBoundingClientRect();
+					left += r.left + el.clientLeft;
+				}
+
+				break;
+			}
+
 			el = el.offsetParent;
 
 		} while (el);
@@ -1192,6 +1209,8 @@ L.LatLngBounds = function (southWest, northEast) { // (LatLng, LatLng) or (LatLn
 L.LatLngBounds.prototype = {
 	// extend the bounds to contain the given point or bounds
 	extend: function (obj) { // (LatLng) or (LatLngBounds)
+		if (!obj) { return this; }
+		
 		if (typeof obj[0] === 'number' || typeof obj[0] === 'string' || obj instanceof L.LatLng) {
 			obj = L.latLng(obj);
 		} else {
@@ -1493,7 +1512,7 @@ L.Map = L.Class.extend({
 		}
 
 		if (options.center && options.zoom !== undefined) {
-			this.setView(L.latLng(options.center), options.zoom, true);
+			this.setView(L.latLng(options.center), options.zoom, {reset: true});
 		}
 
 		this._initLayers(options.layers);
@@ -1512,19 +1531,19 @@ L.Map = L.Class.extend({
 		return this;
 	},
 
-	setZoom: function (zoom) { // (Number)
-		return this.setView(this.getCenter(), zoom);
+	setZoom: function (zoom, options) {
+		return this.setView(this.getCenter(), zoom, {zoom: options});
 	},
 
-	zoomIn: function (delta) {
-		return this.setZoom(this._zoom + (delta || 1));
+	zoomIn: function (delta, options) {
+		return this.setZoom(this._zoom + (delta || 1), options);
 	},
 
-	zoomOut: function (delta) {
-		return this.setZoom(this._zoom - (delta || 1));
+	zoomOut: function (delta, options) {
+		return this.setZoom(this._zoom - (delta || 1), options);
 	},
 
-	setZoomAround: function (latlng, zoom) {
+	setZoomAround: function (latlng, zoom, options) {
 		var scale = this.getZoomScale(zoom),
 		    viewHalf = this.getSize().divideBy(2),
 		    containerPoint = latlng instanceof L.Point ? latlng : this.latLngToContainerPoint(latlng),
@@ -1532,31 +1551,33 @@ L.Map = L.Class.extend({
 		    centerOffset = containerPoint.subtract(viewHalf).multiplyBy(1 - 1 / scale),
 		    newCenter = this.containerPointToLatLng(viewHalf.add(centerOffset));
 
-		return this.setView(newCenter, zoom);
+		return this.setView(newCenter, zoom, {zoom: options});
 	},
 
-	fitBounds: function (bounds, paddingTopLeft, paddingBottomRight) { // (LatLngBounds || ILayer[, Point, Point])
+	fitBounds: function (bounds, options) {
 
+		options = options || {};
 		bounds = bounds.getBounds ? bounds.getBounds() : L.latLngBounds(bounds);
 
-		paddingTopLeft = L.point(paddingTopLeft || [0, 0]);
-		paddingBottomRight = L.point(paddingBottomRight || paddingTopLeft);
+		var paddingTL = L.point(options.paddingTopLeft || options.padding || [0, 0]),
+		    paddingBR = L.point(options.paddingBottomRight || options.padding || [0, 0]),
 
-		var zoom = this.getBoundsZoom(bounds, false, paddingTopLeft.add(paddingBottomRight)),
-		    paddingOffset = paddingBottomRight.subtract(paddingTopLeft).divideBy(2),
+		    zoom = this.getBoundsZoom(bounds, false, paddingTL.add(paddingBR)),
+		    paddingOffset = paddingBR.subtract(paddingTL).divideBy(2),
+
 		    swPoint = this.project(bounds.getSouthWest(), zoom),
 		    nePoint = this.project(bounds.getNorthEast(), zoom),
 		    center = this.unproject(swPoint.add(nePoint).divideBy(2).add(paddingOffset), zoom);
 
-		return this.setView(center, zoom);
+		return this.setView(center, zoom, options);
 	},
 
-	fitWorld: function () {
-		return this.fitBounds([[-90, -180], [90, 180]]);
+	fitWorld: function (options) {
+		return this.fitBounds([[-90, -180], [90, 180]], options);
 	},
 
-	panTo: function (center) { // (LatLng)
-		return this.setView(center, this._zoom);
+	panTo: function (center, options) { // (LatLng)
+		return this.setView(center, this._zoom, {pan: options});
 	},
 
 	panBy: function (offset) { // (Point)
@@ -2545,7 +2566,11 @@ L.TileLayer = L.Class.extend({
 				var className = 'leaflet-tile-container leaflet-zoom-animated';
 
 				this._bgBuffer = L.DomUtil.create('div', className, this._container);
+				this._bgBuffer.style.zIndex = 1;
+
 				this._tileContainer = L.DomUtil.create('div', className, this._container);
+				this._tileContainer.style.zIndex = 2;
+
 			} else {
 				this._tileContainer = this._container;
 			}
@@ -2650,11 +2675,11 @@ L.TileLayer = L.Class.extend({
 
 		var options = this.options;
 
-		if (!options.continuousWorld && options.noWrap) {
+		if (!options.continuousWorld) {
 			var limit = this._getWrapTileNum();
 
 			// don't load if exceeds world bounds
-			if (tilePoint.x < 0 || tilePoint.x >= limit ||
+			if ((options.noWrap && (tilePoint.x < 0 || tilePoint.x >= limit)) ||
 				tilePoint.y < 0 || tilePoint.y >= limit) { return false; }
 		}
 
@@ -3757,7 +3782,7 @@ L.Popup = L.Class.extend({
 		if (this._animated) {
 			events.zoomanim = this._zoomAnimation;
 		}
-		if (this._map.options.closePopupOnClick) {
+		if ('closeOnClick' in this.options ? this.options.closeOnClick : this._map.options.closePopupOnClick) {
 			events.preclick = this._close;
 		}
 		if (this.options.keepInView) {
@@ -3769,7 +3794,7 @@ L.Popup = L.Class.extend({
 
 	_close: function () {
 		if (this._map) {
-			this._map.removeLayer(this);
+			this._map.closePopup(this);
 		}
 	},
 
@@ -3950,10 +3975,13 @@ L.Map.include({
 		return this.addLayer(popup);
 	},
 
-	closePopup: function () {
-		if (this._popup) {
-			this.removeLayer(this._popup);
+	closePopup: function (popup) {
+		if (!popup || popup === this._popup) {
+			popup = this._popup;
 			this._popup = null;
+		}
+		if (popup) {
+			this.removeLayer(popup);
 		}
 		return this;
 	}
@@ -4065,10 +4093,10 @@ L.LayerGroup = L.Class.extend({
 	},
 
 	removeLayer: function (layer) {
-		var id = this.getLayerId(layer);
+		var id = layer in this._layers ? layer : this.getLayerId(layer);
 
 		if (this._map && this._layers[id]) {
-			this._map.removeLayer(layer);
+			this._map.removeLayer(this._layers[id]);
 		}
 
 		delete this._layers[id];
@@ -4079,7 +4107,7 @@ L.LayerGroup = L.Class.extend({
 	hasLayer: function (layer) {
 		if (!layer) { return false; }
 
-		return (this.getLayerId(layer) in this._layers);
+		return (layer in this._layers || this.getLayerId(layer) in this._layers);
 	},
 
 	clearLayers: function () {
@@ -4124,8 +4152,13 @@ L.LayerGroup = L.Class.extend({
 		return this;
 	},
 
+	getLayer: function (id) {
+		return this._layers[id];
+	},
+
 	getLayers: function () {
 		var layers = [];
+
 		for (var i in this._layers) {
 			layers.push(this._layers[i]);
 		}
@@ -4175,6 +4208,10 @@ L.FeatureGroup = L.LayerGroup.extend({
 	},
 
 	removeLayer: function (layer) {
+		if (layer in this._layers) {
+			layer = this._layers[layer];
+		}
+
 		layer.off(L.FeatureGroup.EVENTS, this._propagateEvent, this);
 
 		L.LayerGroup.prototype.removeLayer.call(this, layer);
@@ -5415,7 +5452,7 @@ L.Polygon = L.Polyline.extend({
 		// filter out last point if its equal to the first one
 		latlngs = this._latlngs;
 
-		if (latlngs[0].equals(latlngs[latlngs.length - 1])) {
+		if (latlngs.length >= 2 && latlngs[0].equals(latlngs[latlngs.length - 1])) {
 			latlngs.pop();
 		}
 	},
@@ -5794,7 +5831,7 @@ L.GeoJSON = L.FeatureGroup.extend({
 		    i, len;
 
 		if (features) {
-			for (i = 0, len = features.length; i < len; i++) {
+			for (i = 0 , len = features.length; i < len; i++) {
 				// Only add this if geometry or geometries are set and not null
 				if (features[i].geometries || features[i].geometry || features[i].features) {
 					this.addData(features[i]);
@@ -6601,7 +6638,11 @@ L.Map.Drag = L.Handler.extend({
 
 			} else {
 				L.Util.requestAnimFrame(function () {
-					map.panBy(offset, decelerationDuration, ease, true);
+					map.panBy(offset, {
+						duration: decelerationDuration,
+						easeLinearity: ease,
+						noMoveStart: true
+					});
 				});
 			}
 		}
@@ -7028,7 +7069,7 @@ L.Map.TouchZoom = L.Handler.extend({
 		    center = map.layerPointToLatLng(origin),
 		    zoom = map.getScaleZoom(this._scale);
 
-		map._animateZoom(center, zoom, this._startCenter, this._scale, this._delta, true);
+		map._animateZoom(center, zoom, this._startCenter, this._scale, this._delta);
 	},
 
 	_onTouchEnd: function () {
@@ -7058,7 +7099,7 @@ L.Map.TouchZoom = L.Handler.extend({
 		    zoom = map._limitZoom(oldZoom + roundZoomDelta),
 		    scale = map.getZoomScale(zoom) / this._scale;
 
-		map._animateZoom(center, zoom, origin, scale, null, true);
+		map._animateZoom(center, zoom, origin, scale);
 	},
 
 	_getScaleOrigin: function () {
@@ -8085,6 +8126,7 @@ L.PosAnimation = L.Class.extend({
 
 		this._el = el;
 		this._inProgress = true;
+		this._newPos = newPos;
 
 		this.fire('start');
 
@@ -8123,7 +8165,7 @@ L.PosAnimation = L.Class.extend({
 	// you can't easily get intermediate values of properties animated with CSS3 Transitions,
 	// we need to parse computed style (in case of transform it returns matrix string)
 
-	_transformRe: /(-?[\d\.]+), (-?[\d\.]+)\)/,
+	_transformRe: /([-+]?(?:\d*\.)?\d+)\D*, ([-+]?(?:\d*\.)?\d+)\D*\)/,
 
 	_getPos: function () {
 		var left, top, matches,
@@ -8150,6 +8192,10 @@ L.PosAnimation = L.Class.extend({
 
 		this._el.style[L.DomUtil.TRANSITION] = '';
 
+		// jshint camelcase: false
+		// make sure L.DomUtil.getPosition returns the final position value after animation
+		this._el._leaflet_pos = this._newPos;
+
 		clearInterval(this._stepTimer);
 
 		this.fire('step').fire('end');
@@ -8164,24 +8210,27 @@ L.PosAnimation = L.Class.extend({
 
 L.Map.include({
 
-	setView: function (center, zoom, forceReset) {
+	setView: function (center, zoom, options) {
 
 		zoom = this._limitZoom(zoom);
 		center = L.latLng(center);
+		options = options || {};
 
 		if (this._panAnim) {
 			this._panAnim.stop();
 		}
 
-		var zoomChanged = (this._zoom !== zoom),
-			canBeAnimated = this._loaded && !forceReset && !!this._layers;
+		if (this._loaded && !options.reset && options !== true) {
 
-		if (canBeAnimated) {
+			if (options.animate !== undefined) {
+				options.zoom = L.extend({animate: options.animate}, options.zoom);
+				options.pan = L.extend({animate: options.animate}, options.pan);
+			}
 
 			// try animating pan or zoom
-			var animated = zoomChanged ?
-				this.options.zoomAnimation && this._animateZoomIfClose && this._animateZoomIfClose(center, zoom) :
-				this._animatePanIfClose(center);
+			var animated = (this._zoom !== zoom) ?
+				this._tryAnimatedZoom && this._tryAnimatedZoom(center, zoom, options.zoom) :
+				this._tryAnimatedPan(center, options.pan);
 
 			if (animated) {
 				// prevent resize handler call, the view will refresh after animation anyway
@@ -8196,10 +8245,9 @@ L.Map.include({
 		return this;
 	},
 
-	panBy: function (offset, duration, easeLinearity, noMoveStart) {
+	panBy: function (offset, options) {
 		offset = L.point(offset).round();
-
-		// TODO add options instead of arguments to setView/panTo/panBy/etc.
+		options = options || {};
 
 		if (!offset.x && !offset.y) {
 			return this;
@@ -8215,14 +8263,20 @@ L.Map.include({
 		}
 
 		// don't fire movestart if animating inertia
-		if (!noMoveStart) {
+		if (!options.noMoveStart) {
 			this.fire('movestart');
 		}
 
-		L.DomUtil.addClass(this._mapPane, 'leaflet-pan-anim');
+		// animate pan unless animate: false specified
+		if (options.animate !== false) {
+			L.DomUtil.addClass(this._mapPane, 'leaflet-pan-anim');
 
-		var newPos = this._getMapPanePos().subtract(offset);
-		this._panAnim.run(this._mapPane, newPos, duration || 0.25, easeLinearity);
+			var newPos = this._getMapPanePos().subtract(offset);
+			this._panAnim.run(this._mapPane, newPos, options.duration || 0.25, options.easeLinearity);
+		} else {
+			this._rawPanBy(offset);
+			this.fire('move').fire('moveend');
+		}
 
 		return this;
 	},
@@ -8236,13 +8290,15 @@ L.Map.include({
 		this.fire('moveend');
 	},
 
-	_animatePanIfClose: function (center) {
+	_tryAnimatedPan: function (center, options) {
 		// difference between the new and current centers in pixels
 		var offset = this._getCenterOffset(center)._floor();
 
-		if (!this.getSize().contains(offset)) { return false; }
+		// don't animate too far unless animate: true specified in options
+		if ((options && options.animate) !== true && !this.getSize().contains(offset)) { return false; }
 
-		this.panBy(offset);
+		this.panBy(offset, options);
+
 		return true;
 	}
 });
@@ -8322,7 +8378,7 @@ L.PosAnimation = L.DomUtil.TRANSITION ? L.PosAnimation : L.PosAnimation.extend({
  */
 
 L.Map.mergeOptions({
-	zoomAnimation: L.DomUtil.TRANSITION && !L.Browser.android23 && !L.Browser.mobileOpera,
+	zoomAnimation: true,
 	zoomAnimationThreshold: 4
 });
 
@@ -8344,20 +8400,24 @@ L.Map.include(!L.DomUtil.TRANSITION ? {} : {
 		}
 	},
 
-	_animateZoomIfClose: function (center, zoom) {
+	_tryAnimatedZoom: function (center, zoom, options) {
 
 		if (this._animatingZoom) { return true; }
 
-		// don't animate if zoom difference is too large
-		if (Math.abs(zoom - this._zoom) > this.options.zoomAnimationThreshold) { return false; }
+		options = options || {};
+
+		// don't animate if disabled, not supported or zoom difference is too large
+		if (!this.options.zoomAnimation || options.animate === false ||
+		        !L.DomUtil.TRANSITION || L.Browser.android23 || L.Browser.mobileOpera ||
+		        Math.abs(zoom - this._zoom) > this.options.zoomAnimationThreshold) { return false; }
 
 		// offset is the pixel coords of the zoom origin relative to the current center
 		var scale = this.getZoomScale(zoom),
 		    offset = this._getCenterOffset(center)._divideBy(1 - 1 / scale),
 			origin = this._getCenterLayerPoint()._add(offset);
 
-		// only animate if the zoom origin is within one screen from the current center
-		if (!this.getSize().contains(offset)) { return false; }
+		// don't animate if the zoom origin isn't within one screen from the current center, unless forced
+		if (options.animate !== true && !this.getSize().contains(offset)) { return false; }
 
 		this
 		    .fire('movestart')
@@ -8368,7 +8428,7 @@ L.Map.include(!L.DomUtil.TRANSITION ? {} : {
 		return true;
 	},
 
-	_animateZoom: function (center, zoom, origin, scale, delta, backwards) {
+	_animateZoom: function (center, zoom, origin, scale, delta) {
 
 		this._animatingZoom = true;
 
@@ -8389,8 +8449,7 @@ L.Map.include(!L.DomUtil.TRANSITION ? {} : {
 			zoom: zoom,
 			origin: origin,
 			scale: scale,
-			delta: delta,
-			backwards: backwards
+			delta: delta
 		});
 	},
 
@@ -8426,8 +8485,7 @@ L.TileLayer.include({
 			this._prepareBgBuffer();
 		}
 
-		var transform = L.DomUtil.TRANSFORM,
-		    bg = this._bgBuffer;
+		var bg = this._bgBuffer;
 
 		if (firstFrame) {
 			//prevent bg buffer from clearing right after zoom
@@ -8437,12 +8495,10 @@ L.TileLayer.include({
 			L.Util.falseFn(bg.offsetWidth);
 		}
 
-		var scaleStr = L.DomUtil.getScaleString(e.scale, e.origin),
-		    oldTransform = bg.style[transform];
+		var transform = L.DomUtil.TRANSFORM,
+		    initialTransform = e.delta ? L.DomUtil.getTranslateString(e.delta) : bg.style[transform];
 
-		bg.style[transform] = e.backwards ?
-		        (e.delta ? L.DomUtil.getTranslateString(e.delta) : oldTransform) + ' ' + scaleStr :
-		        scaleStr + ' ' + oldTransform;
+		bg.style[transform] = initialTransform + ' ' + L.DomUtil.getScaleString(e.scale, e.origin);
 	},
 
 	_endZoomAnim: function () {
@@ -8477,8 +8533,10 @@ L.TileLayer.include({
 		// if foreground layer doesn't have many tiles but bg layer does,
 		// keep the existing bg layer and just zoom it some more
 
-		if (bg && this._getLoadedTilesPercentage(bg) > 0.5 &&
-		          this._getLoadedTilesPercentage(front) < 0.5) {
+		var bgLoaded = this._getLoadedTilesPercentage(bg),
+		    frontLoaded = this._getLoadedTilesPercentage(front);
+
+		if (bg && bgLoaded > 0.5 && frontLoaded < 0.5) {
 
 			front.style.visibility = 'hidden';
 			this._stopLoadingImages(front);

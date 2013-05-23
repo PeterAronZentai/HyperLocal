@@ -8,15 +8,27 @@
     <script>
 
         //$data.initService("https://open.jaystack.net/7cd17264-673d-48ab-ac81-12a9df55b0a7/2db09b92-8ddd-4689-8b35-ed6c99391382/api/myDB")
+
+        var name = "Haneen"; // this can come from the url
+        var theDate = new Date(); // this can come from the url
+
         $data.initService("https://dev-open.jaystack.net/a11d6738-0e23-4e04-957b-f14e149a9de8/1162e5ee-49ca-4afd-87be-4e17c491140b/api/mydatabase")
              .then(function (mydb) {
+                 //mydb.saveChanges().then(function (itemsSaved) {
+                 //    alert(itemsSaved);
+                 //});
+                 //var newItem = 
+                 //var newItem = mydb.HaneenTable.add({ ADate: theDate, Name: name });
 
-                 mydb.HaneenTable
-                     //.filter("it.des === 'Rome'")
-                     .forEach(function (item) {
-                         $('#output').append('<div>' + item.ADate.getYear() + ":" + item.ADate.getMonth() + '</div>');
-                         console.log(item);
-                     });
+                 //mydb.saveChanges().then(function () {
+                 //    alert("I have done saving!");
+                 //});
+                 //mydb.HaneenTable
+                 //    //.filter("it.des === 'Rome'")
+                 //    .forEach(function (item) {
+                 //        $('#output').append('<div>' + item.ADate.getYear() + ":" + item.ADate.getMonth() + '</div>');
+                 //        console.log(item);
+                 //    });
                  //work with mydb here
              });
     </script>
