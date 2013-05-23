@@ -665,7 +665,7 @@ var previousValue = 'Rest';
 var lmap, bingKey;
 
 function startSocket() {
-    socket = io.connect('http://dev-open.jaystack.net:80',
+    socket = io.connect('https://dev-open.jaystack.net:443/mydatabase',
         { resource: "a11d6738-0e23-4e04-957b-f14e149a9de8/1162e5ee-49ca-4afd-87be-4e17c491140b/socket.io" });
 
 
