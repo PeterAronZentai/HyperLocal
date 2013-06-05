@@ -11,7 +11,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
 
-    <title>HyperLocal</title>
+    <meta http-equiv="x-ua-compatible" content="IE=edge" />
+        <title>HyperLocal</title>
     <script src="js/vendor/custom.modernizr.js"></script>
     <link rel="stylesheet" href="css.css" />
 <!--    <link href="css/accessibility_foundicons.css" rel="stylesheet" />-->
@@ -134,6 +135,12 @@
              background-color: whitesmoke
          }
     </style>
+    <script>
+        if (window.navigator.userAgent.indexOf("Windows Phone") > -1) {
+            window.orientation = 0;
+        }
+
+    </script>
 </head>
 <body>
 
@@ -172,7 +179,7 @@
                 <div id="map" class="map">
 
 			    </div>
-                <ul class="menu mymenu show-for-touch" id="menu">
+                <ul class="menu mymenu" style="display:none" id="menu">
                     <li class="foundicon-settings"></li>
                     <li id="zoomIn" class="menu-zoom-in"><a class="menu-link foundicon-plus" id="zoomInHref" href="#"></a></li>
                     <li id="zoomOut" class="menu-zoom-out"><a class="menu-link foundicon-minus" href="#" id="zoomOutHref"></a></li>
@@ -466,6 +473,12 @@
         if (android){
             $("body").addClass("android");
         }
+
+        $(function () {
+            if (L.Browser.mobile) {
+                $('.mymenu').show();
+            }
+        });
     </script>
 </body>
 </html>
